@@ -1,0 +1,7 @@
+{
+  "redirects": [
+    { "source": "/:path*", "has": [{ "type": "host", "value": "sudipta-portfolio-hermiones-projects-3d13cc5b.vercel.app" }], "destination": "https://sudipta.site/:path*", "permanent": true },
+    { "source": "/:path*", "has": [{ "type": "host", "value": "sudipta-portfolio-two.vercel.app" }], "destination": "https://sudipta.site/:path*", "permanent": true },
+    { "source": "/:path*", "has": [{ "type": "host", "value": "www.sudipta.site" }], "destination": "https://sudipta.site/:path*", "permanent": true }
+  ]
+}

@@ -1,0 +1,7 @@
+index.backup.html
+index.v*-backup.html
+index.v*-*.html
+.DS_Store
+tests/
+.github/
+README.md

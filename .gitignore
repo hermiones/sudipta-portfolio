@@ -1,0 +1,8 @@
+node_modules/
+tests/test-results/
+tests/playwright-report/
+.vercel
+.DS_Store
+index.backup.html
+index.v*-backup.html
+index.v*-*.html
