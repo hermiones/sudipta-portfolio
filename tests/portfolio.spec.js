@@ -16,7 +16,7 @@ for (const [name, width, height, hasTouch] of sizes) {
       const errors = [];
       page.on('pageerror', e => errors.push(e.message));
       await page.goto('/');
-      await page.waitForTimeout(3500); // let the build intro finish
+      await page.waitForTimeout(5000); // let the build intro finish
 
       const r = await page.evaluate(() => {
         const vw = document.documentElement.clientWidth;

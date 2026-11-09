@@ -6,7 +6,9 @@
 <title>Sudipta Mohanty · SDET</title>
 <meta name="description" content="Sudipta Mohanty: SDET with 5+ years in Playwright, Selenium, Pytest, CI/CD (Azure DevOps, AWS) and AI-assisted QA with Claude multi-agent workflows. Based in Kolkata, open to roles across India.">
 <meta name="theme-color" content="#070b16">
-<script>try{if(localStorage.getItem("theme")==="light")document.documentElement.dataset.theme="light"}catch(e){}</script>
+<script>try{if(localStorage.getItem("theme")==="light")document.documentElement.dataset.theme="light"}catch(e){}
+try{var nv=performance.getEntriesByType&&performance.getEntriesByType("navigation")[0];
+if(!location.hash&&!matchMedia("(prefers-reduced-motion: reduce)").matches&&!(nv&&nv.type==="back_forward")){document.documentElement.classList.add("prebuild");if("scrollRestoration" in history)history.scrollRestoration="manual"}}catch(e){}</script>
 <meta property="og:type" content="website">
 <meta property="og:title" content="Sudipta Mohanty · SDET · Test Automation & AI-Assisted QA">
 <meta property="og:description" content="5+ yrs · Playwright · Selenium · CI/CD · Claude multi-agent QA. 500+ tests automated, 40% fewer escaped defects.">
@@ -307,7 +309,8 @@ body::before{display:none}
 .factions{display:flex;gap:12px;flex-wrap:wrap}
 .btn:disabled{opacity:.6;cursor:wait}
 .fstatus{font-size:.8rem;min-height:1.2em;color:var(--muted)}
-.fstatus.ok{color:#34d399}.fstatus.err{color:#fbbf24}
+.fstatus.ok{color:var(--pass)}.fstatus.err{color:var(--warn)}
+.fstatus a{color:var(--red);text-decoration:underline}
 @media (max-width:600px){.frow{grid-template-columns:1fr}.cform{padding:18px}}
 
 
@@ -349,6 +352,9 @@ body::before{display:none}
 @media (max-width:900px){.geo-hero{width:380px;height:380px;right:-90px;top:0;opacity:.35}.geo-contact{width:480px;height:320px}}
 /* swarm build intro */
 .unbuilt{opacity:0!important}
+html.prebuild nav:not(.dock),html.prebuild .hero .tag,html.prebuild .hero h1,html.prebuild .hero .headline,html.prebuild .hero .avail,html.prebuild .hero .role,html.prebuild .hero .typedline,html.prebuild .hero .cta,html.prebuild .hero .sw-hint,html.prebuild .hero .soc,html.prebuild .hero .stats,html.prebuild .hero .badges,html.prebuild .hero .ci,html.prebuild .hero .portrait{opacity:0!important}
+.geo-hero,.rain{transition:opacity 1.2s ease}
+html.prebuild .geo-hero,html.prebuild .rain,html.building .geo-hero,html.building .rain{opacity:0!important}
 .built-in{animation:builtIn .7s cubic-bezier(.2,.7,.2,1)}
 @keyframes builtIn{from{opacity:0;clip-path:inset(0 100% 0 0);filter:brightness(2.2)}60%{filter:brightness(1.4)}to{opacity:1;clip-path:inset(0 0 0 0);filter:none}}
 #buildCv{position:fixed;inset:0;z-index:9990;pointer-events:none;transition:opacity .6s}
@@ -604,6 +610,7 @@ h1.grad-text>span:last-child{color:var(--red2)}
 @media (max-width:600px){.hire-dl div{grid-template-columns:1fr;gap:2px}.m-in{padding:22px 18px}}
 .cmdk{max-width:min(620px,94vw);margin-top:12vh}
 .cmdk .m-in{padding:0;overflow:hidden}
+#cmdkIn:focus,#cmdkIn:focus-visible{outline:none!important;box-shadow:inset 0 -2px 0 var(--red)}
 #cmdkIn{width:100%;font:inherit;font-size:1.05rem;padding:18px 20px;background:transparent;border:0;border-bottom:1px solid var(--line);color:var(--text);outline:none}
 #cmdkList{list-style:none;max-height:50vh;overflow:auto;padding:8px}
 #cmdkList li{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:.95rem}
@@ -626,8 +633,16 @@ h1.grad-text>span:last-child{color:var(--red2)}
 
 
 /* ===== live eye counter + engagement patterns ===== */
+/* nav: buttons never shrink; lower-priority items hide in tiers */
+nav .wrap{gap:12px}
+nav .wrap>*{flex-shrink:0}
+nav .links{flex:1 1 auto;min-width:0;justify-content:center;gap:clamp(12px,1.6vw,26px)}
+nav .links a{white-space:nowrap}
 nav .btn{white-space:nowrap}
-@media (max-width:1440px){nav .navsoc{display:none}.links{gap:22px}}
+nav .navsoc{display:none}
+@media (max-width:1227px){nav .runner{display:none}}
+@media (max-width:1180px){nav .links a[href="#swarm"],nav .links a[href="#code"]{display:none}}
+@media (max-width:1060px){nav .links a[href="#writing"],nav .links a[href="#about"]{display:none}nav .navcv{padding:10px 12px}}
 @media (max-width:1180px){nav .navsoc,nav .runner{display:none}.links{gap:18px}}
 .live-eye{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 10px;border:1px solid var(--line);font-size:.8rem;color:var(--muted)}
 .live-eye[hidden]{display:none}
@@ -646,6 +661,22 @@ nav .btn{white-space:nowrap}
 .repos{grid-auto-flow:dense}
 .demo-link{display:inline-block;margin-top:16px;font-size:.85rem;color:var(--red);border-bottom:1px dashed}
 .demo-link:hover{color:var(--cta)}
+
+/* ===== light-mode audit fixes ===== */
+/* terminal card + swarm demo stay a consistent dark "terminal" panel in both themes */
+[data-theme=light] .term,[data-theme=light] .sw{--bg:#070b16;--bg2:#0b1222;--card:#0e1628;--line:#1d2a44;--text:#e8eefc;--muted:#93a1bf;--head:#f4f7ff;
+ --red:#22d3ee;--red2:#a78bfa;--term:#4ade80;--pass:#34d399;--cta:#22d3ee;--cta-ink:#06101f;--grad:linear-gradient(110deg,#22d3ee,#a78bfa,#22d3ee);color:var(--text)}
+[data-theme=light] .term{background:#0e1628;border-color:#1d2a44}
+[data-theme=light] .flaky-msg{background:rgba(255,255,255,.96);color:var(--pass)}
+[data-theme=light] .cp span{background:#fff;border:1px solid var(--line);color:var(--muted)}
+[data-theme=light] .cp.run span{color:var(--red)}
+[data-theme=light] .bot-a{background:#fff;color:#122033}
+[data-theme=light] .filters button.on,[data-theme=light] .filters button:hover{color:#fff}
+[data-theme=light] .box .row.award b{color:#9A5300}
+[data-theme=light] .live{color:var(--pass)}
+.bi.ant{background:#B4532F}
+.bi.sel{background:#2E7D32}
+
 .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s}
 .reveal.in{opacity:1;transform:none}
 
@@ -1028,9 +1059,9 @@ sdet · scrum master <span class="cursor"></span></pre>
         <label><span>I'm reaching out about</span><select name="topic"><option>A job opportunity</option><option>Freelance / contract work</option><option>Collaboration</option><option>Just saying hi</option></select></label>
       </div>
       <label><span>Message *</span><textarea name="message" rows="4" required placeholder="Role, location, and anything else useful…"></textarea></label>
-      <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off">
+      <input type="text" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
       <div class="factions">
-        <button type="submit" class="btn" id="fsend">Send message →</button>
+        <button type="submit" class="btn" id="fsend">Send via email →</button>
         <a href="https://www.linkedin.com/in/sudiptamohanty" target="_blank" rel="noopener" class="btn ghost">Message on LinkedIn ↗</a>
         <a href="https://github.com/hermiones" target="_blank" rel="noopener" class="btn ghost">View GitHub ↗</a>
       </div>
@@ -1068,7 +1099,7 @@ sdet · scrum master <span class="cursor"></span></pre>
 </dialog>
 <dialog id="cmdk" class="modal cmdk" aria-label="Command palette">
   <div class="m-in">
-    <input id="cmdkIn" type="text" placeholder="Type a command… try: sudo hire sudipta" autocomplete="off" spellcheck="false" aria-label="Command">
+    <input id="cmdkIn" type="text" placeholder="Jump to… (try: cv, skills, projects, contact)" autocomplete="off" spellcheck="false" aria-label="Command">
     <ul id="cmdkList" role="listbox"></ul>
     <div class="cmdk-foot mono">↑↓ navigate · ↵ run · esc close</div>
   </div>
@@ -1183,19 +1214,40 @@ document.querySelectorAll('.grid').forEach(g=>gio.observe(g));
 // contact form -> delivered to inbox via FormSubmit; address only assembled at send time
 document.querySelectorAll('.to-form').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();
  document.getElementById('contact').scrollIntoView({behavior:'smooth'});setTimeout(()=>document.querySelector('#cform input').focus({preventScroll:true}),700)}));
+// Future scope: paste Web3Forms access key to send without opening a mail app.
+const WEB3FORMS_KEY = '';
+// mailto opener (tests can spy on it by setting window.__mailHook)
+function openMail(url){(window.__mailHook||(u=>{location.href=u}))(url)}
 (()=>{const f=document.getElementById('cform'),st=document.getElementById('fstatus'),b=document.getElementById('fsend');
+ const LI='https://www.linkedin.com/in/sudiptamohanty',TIMEOUT=12000,LABEL='Send via email →';
+ const addr=()=>atob('bW9jLmxpYW1nQDAyYXlpZGF0cGlkdXM=').split('').reverse().join('');
+ const subj=d=>'Portfolio: '+d.topic+' — '+d.name+(d.company?' ('+d.company+')':'');
+ const plain=d=>`Name: ${d.name}\nEmail: ${d.email}\nCompany: ${d.company||'-'}\nTopic: ${d.topic}\n\n${d.message}`;
+ const status=(cls,parts)=>{st.innerHTML='';st.className='fstatus mono '+cls;parts.forEach(x=>st.append(typeof x==='string'?document.createTextNode(x):x))};
+ const liLink=()=>{const a=document.createElement('a');a.href=LI;a.target='_blank';a.rel='noopener';a.textContent='LinkedIn ↗';return a};
+ async function copy(t){try{await navigator.clipboard.writeText(t);return true}catch(x){return false}}
+ async function sendWeb3(d){const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),TIMEOUT);
+  try{const r=await fetch('https://api.web3forms.com/submit',{method:'POST',signal:ctl.signal,headers:{'Content-Type':'application/json',Accept:'application/json'},
+    body:JSON.stringify({access_key:WEB3FORMS_KEY,name:d.name,email:d.email,subject:subj(d),message:d.message,company:d.company||'',topic:d.topic,from_name:'sudipta.site',botcheck:''})});
+   const j=await r.json();if(!r.ok||j.success!==true)throw new Error('web3forms')}finally{clearTimeout(t)}}
+ function mailtoUrl(d){const footer='\n\n—\nFrom: '+d.name+' <'+d.email+'>'+(d.company?' · '+d.company:'')+' · via sudipta.site';
+  let msg=d.message,u;const build=m=>'mailto:'+addr()+'?subject='+encodeURIComponent(subj(d))+'&body='+encodeURIComponent(m+footer);
+  u=build(msg);while(u.length>1800&&msg.length>0){msg=msg.slice(0,Math.max(0,msg.length-Math.ceil((u.length-1800)/3)-20))+'…';u=build(msg)}return u}
  f.addEventListener('submit',async e=>{e.preventDefault();
-  if(f._honey.value)return;
-  if(!f.checkValidity()){st.textContent='⚠ Please fill in your name, a valid email and a message.';st.className='fstatus mono err';f.reportValidity();return}
-  b.disabled=true;b.textContent='Sending…';st.textContent='> POST /contact …';st.className='fstatus mono';
-  const d=Object.fromEntries(new FormData(f));delete d._honey;
-  d._subject='Portfolio: '+d.topic+' — '+d.name+(d.company?' ('+d.company+')':'');d._template='table';d._captcha='false';d._replyto=d.email;
-  try{const to=atob('bW9jLmxpYW1nQDAyYXlpZGF0cGlkdXM=').split('').reverse().join('');
-   const r=await fetch('https://formsubmit.co/ajax/'+to,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(d)});
-   const j=await r.json();if(!r.ok||j.success==='false'||j.success===false)throw 0;
-   st.textContent='✓ 200 OK — message delivered. I\'ll get back to you soon!';st.className='fstatus mono ok';f.reset()}
-  catch(_){st.textContent='✗ Couldn\'t send right now. Please reach me on LinkedIn instead.';st.className='fstatus mono err'}
-  b.disabled=false;b.textContent='Send message →'});})();
+  if(f.botcheck&&f.botcheck.value)return;
+  if(!f.checkValidity()){status('err',['⚠ Please fill in your name, a valid email and a message.']);f.reportValidity();return}
+  const d=Object.fromEntries(new FormData(f));delete d.botcheck;
+  if(WEB3FORMS_KEY){
+   b.disabled=true;b.textContent='Sending…';status('',['> POST /contact …']);
+   try{await sendWeb3(d);status('ok',['✓ 200 OK — message delivered. I\'ll get back to you soon!']);f.reset()}
+   catch(_){const c=await copy(plain(d));status('err',['✗ Couldn\'t reach the mail service. '+(c?'Your message is copied to your clipboard. ':'')+'Please send it to me on ',liLink()])}
+   finally{b.disabled=false;b.textContent=LABEL}
+   return}
+  await copy(plain(d));
+  openMail(mailtoUrl(d));
+  const a=addr(),m=document.createElement('a');m.href='mailto:'+a;m.textContent=a;
+  status('ok',['✓ Opening your email app… If nothing opened, your message is copied. Email it to ',m,' or message me on ',liLink()]);
+ });})();
 
 
 // ===== AGENT SWARM: fan-out / fan-in visualisation =====
@@ -1293,8 +1345,8 @@ document.querySelectorAll('.to-form').forEach(a=>a.addEventListener('click',e=>{
    S.v.forEach((p,i)=>{let[x,y,z]=p;if(S.split&&i>=S.split){const k=-2.2;const c2=Math.cos(ay*k),s2=Math.sin(ay*k);[x,z]=[x*c2-z*s2,x*s2+z*c2]}
     let X=x*cy-z*sy,Z=x*sy+z*cy,Y=y*cx-Z*sx;Z=y*sx+Z*cx;const f=sc/(Z+3.2);P.push([W/2+X*f,H/2+Y*f,Z])});
    c.lineWidth=1;for(const[a,b]of S.e){const z=(P[a][2]+P[b][2])/2,al=.12+.55*(1-(z+1.3)/2.6);
-    c.strokeStyle=(S.split&&a>=S.split)?`rgba(167,139,250,${al})`:`rgba(34,211,238,${al})`;c.beginPath();c.moveTo(P[a][0],P[a][1]);c.lineTo(P[b][0],P[b][1]);c.stroke()}
-   if(cv.dataset.shape==='ico'){c.fillStyle='#67e8f9';P.forEach(p=>{c.beginPath();c.arc(p[0],p[1],p[2]<0?2.4:1.4,0,6.3);c.fill()})}
+    c.strokeStyle=(S.split&&a>=S.split)?(isLight()?`rgba(109,40,217,${al*.85})`:`rgba(167,139,250,${al})`):(isLight()?`rgba(14,116,144,${al*.85})`:`rgba(34,211,238,${al})`);c.beginPath();c.moveTo(P[a][0],P[a][1]);c.lineTo(P[b][0],P[b][1]);c.stroke()}
+   if(cv.dataset.shape==='ico'){c.fillStyle=isLight()?'#0E7490':'#67e8f9';P.forEach(p=>{c.beginPath();c.arc(p[0],p[1],p[2]<0?2.4:1.4,0,6.3);c.fill()})}
    if(vis&&!document.hidden)raf=requestAnimationFrame(draw)}
   size();addEventListener('resize',()=>{size()});
   new IntersectionObserver(([e])=>{vis=e.isIntersecting;cancelAnimationFrame(raf);if(vis&&!reduce)raf=requestAnimationFrame(draw);else if(reduce)draw(0)}).observe(cv);
@@ -1302,10 +1354,17 @@ document.querySelectorAll('.to-form').forEach(a=>a.addEventListener('click',e=>{
   addEventListener('scroll',()=>{sp=Math.min(sp+.004,.05)},{passive:true});});})();
 
 // ===== swarm agents build the page in front of you =====
-(()=>{const Q=[['nav','<nav>'],['.hero .tag','<span.tag>'],['.hero h1','<h1>'],['.hero h1 + p','<p.typed>'],['.role','<p.role>'],['.cta','<div.cta>'],['.sw-hint','<a.hint>'],['.soc','<div.socials>'],['.stats','<div.stats>'],['.portrait','<figure.photo>']];
+(()=>{const Q=[['nav:not(.dock)','<nav>'],['.hero .tag','<span.tag>'],['.hero h1','<h1>'],['.hero .headline','<p.headline>'],['.hero .avail','<ul.avail>'],['.hero .role','<p.role>'],['.hero .typedline','<p.typed>'],['.hero .cta','<div.cta>'],['.hero .sw-hint','<a.hint>'],['.hero .soc','<div.socials>'],['.hero .stats','<div.stats>'],['.hero .badges','<div.badges>'],['.hero .ci','<a.ci-badge>'],['.hero .portrait','<figure.photo>']];
+ const root=document.documentElement;let fallback;
+ function revealAll(){Q.forEach(([q])=>{const el=document.querySelector(q);if(el)el.classList.remove('unbuilt')});root.classList.remove('prebuild','building')}
+ function arm(){clearTimeout(fallback);fallback=setTimeout(revealAll,6000)}
+ arm();
  const cols=['#22d3ee','#38bdf8','#818cf8','#a78bfa','#67e8f9'];
- function start(){if(reduce||scrollY>innerHeight*.5)return;
-  const T=Q.map(([q,l])=>({el:document.querySelector(q),l})).filter(t=>t.el);T.forEach(t=>t.el.classList.remove('built-in'));
+ function start(){try{startInner()}catch(err){revealAll()}}
+ function startInner(){if(reduce||scrollY>innerHeight*.5){revealAll();return}
+  arm();if(document.getElementById('buildCv'))return;
+  const T=Q.map(([q,l])=>({el:document.querySelector(q),l})).filter(t=>t.el);T.forEach(t=>{t.el.classList.remove('built-in');t.el.classList.add('unbuilt')});
+  root.classList.add('building');root.classList.remove('prebuild');
   const cv=document.createElement('canvas');cv.id='buildCv';document.body.appendChild(cv);const c=cv.getContext('2d');
   const d=Math.min(2,devicePixelRatio||1),W=innerWidth,H=innerHeight;cv.width=W*d;cv.height=H*d;c.setTransform(d,0,0,d,0,0);
   const st=document.createElement('div');st.className='bstat';st.innerHTML='<span>◉ <b>swarm</b> · 96 agents · <span id="bmsg">spawning…</span></span><button type="button">skip ›</button>';document.body.appendChild(st);
@@ -1314,7 +1373,7 @@ document.querySelectorAll('.to-form').forEach(a=>a.addEventListener('click',e=>{
   for(let i=0;i<N;i++){const a=Math.random()*6.28,R=Math.max(W,H)*.75;P.push({x:cx+Math.cos(a)*R,y:cy+Math.sin(a)*R,px:0,py:0,t:i%T.length,c:cols[i%cols.length],s:.8+Math.random()*.5,st:0,tx:0,ty:0,a:Math.random()*6.28,r:30+Math.random()*60})}
   T.forEach(t=>{const r=t.el.getBoundingClientRect();t.r=r;t.done=false});
   const labels=[],ripples=[];let t0=performance.now(),dead=false,raf;const GAP=W<700?150:170,BEGIN=450;
-  function finish(){if(dead)return;dead=true;T.forEach(t=>{if(t.el.classList.contains('unbuilt')){t.el.classList.remove('unbuilt');t.el.classList.add('built-in')}});
+  function finish(){if(dead)return;dead=true;clearTimeout(fallback);T.forEach(t=>{if(t.el.classList.contains('unbuilt')){t.el.classList.remove('unbuilt');t.el.classList.add('built-in')}});root.classList.remove('building','prebuild');
    msg.textContent='build passed ✓';cv.style.opacity=0;st.style.opacity=0;setTimeout(()=>{cancelAnimationFrame(raf);cv.remove();st.remove()},650);try{sessionStorage.setItem('built',1)}catch(e){}}
   st.querySelector('button').onclick=finish;
   setTimeout(()=>['wheel','keydown','touchstart'].forEach(ev=>addEventListener(ev,finish,{once:true,passive:true})),50);
@@ -1333,24 +1392,24 @@ document.querySelectorAll('.to-form').forEach(a=>a.addEventListener('click',e=>{
     p.x+=(p.tx-p.x)*k;p.y+=(p.ty-p.y)*k}
    const fade=el>end?Math.max(0,1-(el-end)/500):1;c.globalAlpha=fade;c.lineWidth=1.4;
    const arrow=(x,y,k)=>{c.moveTo(x,y);c.lineTo(x,y+15*k);c.lineTo(x+3.8*k,y+11.2*k);c.lineTo(x+6.6*k,y+17*k);c.lineTo(x+8.8*k,y+16*k);c.lineTo(x+6*k,y+10.4*k);c.lineTo(x+11*k,y+10.4*k);c.closePath()};
-   c.lineWidth=1;c.strokeStyle='#070b16';
-   for(const col of cols){c.fillStyle=col;c.beginPath();for(const p of P)if(p.c===col)arrow(p.x,p.y,p.s);c.fill();c.stroke()}
+   c.lineWidth=1;c.strokeStyle=isLight()?'#ffffff':'#070b16';
+   for(const col of cols){c.fillStyle=tcol(col);c.beginPath();for(const p of P)if(p.c===col)arrow(p.x,p.y,p.s);c.fill();c.stroke()}
    c.font='600 10px "JetBrains Mono",monospace';
    for(let k=0;k<Math.min(8,P.length);k++){const p=P[k],tag='agent-'+String(k+1).padStart(2,'0'),w=c.measureText(tag).width+10;
-    c.fillStyle=p.c;c.fillRect(p.x+12,p.y+14,w,15);c.fillStyle='#06101f';c.fillText(tag,p.x+17,p.y+25)}
+    c.fillStyle=tcol(p.c);c.fillRect(p.x+12,p.y+14,w,15);c.fillStyle=isLight()?'#ffffff':'#06101f';c.fillText(tag,p.x+17,p.y+25)}
    // scan line + bracket on the element currently being built
    T.forEach((t,i)=>{const go=BEGIN+i*GAP,q=(el-go-450)/450;if(q>0&&q<1){const r=t.r,x=r.left+q*r.width,col=cols[i%cols.length];
-     c.strokeStyle=col;c.globalAlpha=fade*.9;c.beginPath();c.moveTo(x,r.top-4);c.lineTo(x,r.bottom+4);c.stroke();
+     c.strokeStyle=tcol(col);c.globalAlpha=fade*.9;c.beginPath();c.moveTo(x,r.top-4);c.lineTo(x,r.bottom+4);c.stroke();
      c.setLineDash([4,4]);c.strokeRect(r.left-4,r.top-4,r.width+8,r.height+8);c.setLineDash([]);c.globalAlpha=fade}});
    c.font='600 11px "JetBrains Mono",monospace';
    labels.forEach(L=>{const a=Math.max(0,1-(now-L.b)/1400);if(!a)return;c.globalAlpha=a*fade;const w=c.measureText(L.s).width+12;
-    c.fillStyle=L.c;c.fillRect(L.x,L.y-15,w,17);c.fillStyle='#06101f';c.fillText(L.s,L.x+6,L.y-3)});
-   ripples.forEach(R=>{const q=(now-R.b)/600;if(q<1){c.globalAlpha=(1-q)*fade;c.strokeStyle=R.c;c.lineWidth=2;c.beginPath();c.arc(R.x,R.y,8+q*60,0,6.3);c.stroke()}});
+    c.fillStyle=tcol(L.c);c.fillRect(L.x,L.y-15,w,17);c.fillStyle=isLight()?'#ffffff':'#06101f';c.fillText(L.s,L.x+6,L.y-3)});
+   ripples.forEach(R=>{const q=(now-R.b)/600;if(q<1){c.globalAlpha=(1-q)*fade;c.strokeStyle=tcol(R.c);c.lineWidth=2;c.beginPath();c.arc(R.x,R.y,8+q*60,0,6.3);c.stroke()}});
    c.globalAlpha=1;
    if(el>end+520)return finish();raf=requestAnimationFrame(frame)}
   raf=requestAnimationFrame(frame)}
- (document.fonts?document.fonts.ready:Promise.resolve()).then(()=>setTimeout(start,150));
- document.getElementById('rebuild').addEventListener('click',e=>{e.preventDefault();start()});
+ Promise.race([document.fonts?document.fonts.ready:Promise.resolve(),new Promise(r=>setTimeout(r,300))]).then(()=>setTimeout(start,30));
+ document.getElementById('rebuild').addEventListener('click',e=>{e.preventDefault();scrollTo({top:0,behavior:'auto'});setTimeout(start,60)});
 })();
 
 
@@ -1412,19 +1471,19 @@ document.querySelectorAll('.flaky').forEach(c=>{const t=()=>{c.classList.add('q'
   const exiting=!cur&&!queue.length;
   if(tgt){const r=tgt.getBoundingClientRect();
    if(r.bottom<-50||r.top>H+50){/* scrolled away: build instantly */cur&&cur.T.forEach(el=>{const b=el.getBoundingClientRect();if(b.bottom<0||b.top>H)build(el,false)})}
-   else{c.strokeStyle='#22d3ee';c.globalAlpha=.85;c.lineWidth=1.2;const sx=r.left+q*r.width;c.beginPath();c.moveTo(sx,r.top-4);c.lineTo(sx,r.bottom+4);c.stroke();
+   else{c.strokeStyle=tcol('#22d3ee');c.globalAlpha=.85;c.lineWidth=1.2;const sx=r.left+q*r.width;c.beginPath();c.moveTo(sx,r.top-4);c.lineTo(sx,r.bottom+4);c.stroke();
     c.setLineDash([4,4]);c.strokeRect(r.left-5,r.top-5,r.width+10,r.height+10);c.setLineDash([]);c.globalAlpha=1;
     A.forEach(a=>{const tx=r.left+Math.min(a.ox,q+.15)*r.width,ty=r.top+a.oy*r.height;a.x+=(tx-a.x)*.12;a.y+=(ty-a.y)*.12})}}
   if(exiting)A.forEach(a=>{a.x+=(a.ex-a.x)*.05;a.y+=(a.ey-a.y)*.05;a.al-=.02});
   A=A.filter(a=>a.al>0);
-  c.lineWidth=1;c.strokeStyle='#070b16';
-  for(const col of cols){c.fillStyle=col;c.beginPath();let any=false;for(const a of A)if(a.c===col){c.globalAlpha=Math.max(0,a.al);arrow(a.x,a.y,a.s);any=true}if(any){c.fill();c.stroke()}}
+  c.lineWidth=1;c.strokeStyle=isLight()?'#ffffff':'#070b16';
+  for(const col of cols){c.fillStyle=tcol(col);c.beginPath();let any=false;for(const a of A)if(a.c===col){c.globalAlpha=Math.max(0,a.al);arrow(a.x,a.y,a.s);any=true}if(any){c.fill();c.stroke()}}
   c.globalAlpha=1;c.font='600 10px "JetBrains Mono",monospace';
-  A.slice(0,4).forEach(a=>{const t='agent-'+String(a.k+1).padStart(2,'0'),w=c.measureText(t).width+10;c.globalAlpha=Math.max(0,a.al);c.fillStyle=a.c;c.fillRect(a.x+12,a.y+14,w,15);c.fillStyle='#06101f';c.fillText(t,a.x+17,a.y+25)});
-  ripples=ripples.filter(R=>now-R.b<600);ripples.forEach(R=>{const r=R.el.getBoundingClientRect(),k=(now-R.b)/600;c.globalAlpha=1-k;c.strokeStyle=R.c;c.lineWidth=2;c.beginPath();c.arc(r.left+r.width/2,r.top+Math.min(r.height/2,60),8+k*50,0,6.3);c.stroke()});
+  A.slice(0,4).forEach(a=>{const t='agent-'+String(a.k+1).padStart(2,'0'),w=c.measureText(t).width+10;c.globalAlpha=Math.max(0,a.al);c.fillStyle=tcol(a.c);c.fillRect(a.x+12,a.y+14,w,15);c.fillStyle=isLight()?'#ffffff':'#06101f';c.fillText(t,a.x+17,a.y+25)});
+  ripples=ripples.filter(R=>now-R.b<600);ripples.forEach(R=>{const r=R.el.getBoundingClientRect(),k=(now-R.b)/600;c.globalAlpha=1-k;c.strokeStyle=tcol(R.c);c.lineWidth=2;c.beginPath();c.arc(r.left+r.width/2,r.top+Math.min(r.height/2,60),8+k*50,0,6.3);c.stroke()});
   c.font='600 11px "JetBrains Mono",monospace';
   labels=labels.filter(L=>now-L.b<1300);labels.forEach(L=>{const r=L.el.getBoundingClientRect(),al=1-(now-L.b)/1300,w=c.measureText(L.s).width+12,y=Math.max(14,r.top-8);
-   c.globalAlpha=al;c.fillStyle=L.c;c.fillRect(r.left,y-15,w,17);c.fillStyle='#06101f';c.fillText(L.s,r.left+6,y-3)});
+   c.globalAlpha=al;c.fillStyle=tcol(L.c);c.fillRect(r.left,y-15,w,17);c.fillStyle=isLight()?'#ffffff':'#06101f';c.fillText(L.s,r.left+6,y-3)});
   c.globalAlpha=1;
   if(cur||queue.length||A.length||labels.length||ripples.length)raf=requestAnimationFrame(frame);else c.clearRect(0,0,W,H)}
  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);startSec(e.target)}}),{threshold:.12,rootMargin:'0px 0px -10% 0px'});
@@ -1475,6 +1534,10 @@ document.querySelectorAll('.flaky').forEach(c=>{const t=()=>{c.classList.add('q'
  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&vis)requestAnimationFrame(f)});requestAnimationFrame(f)})();
 
 
+// theme helpers for canvas drawing
+function isLight(){return document.documentElement.dataset.theme==='light'}
+const LIGHT_MAP={'#22d3ee':'#0E7490','#38bdf8':'#0369A1','#818cf8':'#4F46E5','#a78bfa':'#6D28D9','#67e8f9':'#0891B2'};
+function tcol(c){return isLight()?(LIGHT_MAP[c]||c):c}
 // ===== light / dark theme toggle =====
 (()=>{const b=document.getElementById('themeBtn'),root=document.documentElement;
  const sync=()=>{const l=root.dataset.theme==='light';b.textContent=l?'☾':'☀';b.setAttribute('aria-label',l?'Switch to dark theme':'Switch to light theme')};sync();
@@ -1555,15 +1618,15 @@ window.celebrate=()=>{let done;try{done=sessionStorage.getItem('cheered')}catch(
   P=Array.from({length:n},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35}))}
  let rt;size();addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(size,200)});
  const L=110*110,M=170*170;
- function draw(){c.clearRect(0,0,W,H);c.fillStyle='rgba(167,139,250,.55)';c.beginPath();
+ function draw(){const lt=isLight();c.clearRect(0,0,W,H);c.fillStyle=lt?'rgba(109,40,217,.4)':'rgba(167,139,250,.55)';c.beginPath();
   const tt=performance.now()/1000;for(let k=0;k<P.length;k++){const p=P[k];p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
    if(fine&&k<10&&mx>0){const a=tt*(.8+k*.07)+k*.63,R=28+(k%4)*14;p.x+=(mx+Math.cos(a)*R-p.x)*.06;p.y+=(my+Math.sin(a)*R-p.y)*.06}
    else if(fine){const dx=p.x-mx,dy=p.y-my,d2=dx*dx+dy*dy;if(d2<19600&&d2>1){const d=Math.sqrt(d2);p.x+=dx/d*1.2;p.y+=dy/d*1.2}}
    c.moveTo(p.x+1.4,p.y);c.arc(p.x,p.y,1.4,0,6.3)}
   c.fill();c.lineWidth=1;
   for(let i=0;i<P.length;i++){const a=P[i];for(let j=i+1;j<P.length;j++){const b=P[j],dx=a.x-b.x,dy=a.y-b.y,d2=dx*dx+dy*dy;
-   if(d2<L){c.strokeStyle=`rgba(34,211,238,${.18*(1-d2/L)})`;c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke()}}}
-  if(fine)for(const p of P){const dx=p.x-mx,dy=p.y-my,d2=dx*dx+dy*dy;if(d2<M){c.strokeStyle=`rgba(167,139,250,${.35*(1-d2/M)})`;c.beginPath();c.moveTo(p.x,p.y);c.lineTo(mx,my);c.stroke()}}
+   if(d2<L){c.strokeStyle=lt?`rgba(14,116,144,${.2*(1-d2/L)})`:`rgba(34,211,238,${.18*(1-d2/L)})`;c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke()}}}
+  if(fine)for(const p of P){const dx=p.x-mx,dy=p.y-my,d2=dx*dx+dy*dy;if(d2<M){c.strokeStyle=lt?`rgba(109,40,217,${.3*(1-d2/M)})`:`rgba(167,139,250,${.35*(1-d2/M)})`;c.beginPath();c.moveTo(p.x,p.y);c.lineTo(mx,my);c.stroke()}}
   if(run)raf=requestAnimationFrame(draw)}
  draw();
  document.addEventListener('visibilitychange',()=>{run=!document.hidden;if(run){cancelAnimationFrame(raf);draw()}});})();

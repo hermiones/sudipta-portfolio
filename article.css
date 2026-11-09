@@ -44,4 +44,26 @@ figcaption{font-family:var(--mono);font-size:.75rem;color:var(--muted);margin-to
 .btn{display:inline-block;font-family:var(--mono);font-size:.85rem;padding:12px 18px;border:1px solid var(--cta);background:var(--cta);color:#06101f;text-decoration:none;font-weight:600}
 [data-theme=light] .btn{color:#fff}
 .btn.ghost{background:transparent;color:var(--text);border-color:var(--line)}
+
+/* theme toggle + homepage-consistent violet accents */
+:root{--violet:#a78bfa;--grad:linear-gradient(110deg,#22d3ee,#a78bfa)}
+[data-theme=light]{--violet:#6D28D9;--grad:linear-gradient(110deg,#0E7490,#6D28D9)}
+.theme-btn{display:inline-grid;place-items:center;width:32px;height:32px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;font-size:.95rem;border-radius:6px;transition:.2s}
+.theme-btn:hover,.theme-btn:focus-visible{color:var(--text);border-color:var(--text)}
+.top .nav-r{display:flex;align-items:center;gap:16px}
+.kpi b{color:var(--blue)}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){.kpi b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}}
+.next a:hover{border-color:var(--violet)}
+.next small{color:var(--violet)}
+a:hover{color:var(--violet)}
+.top a:hover{color:var(--text)}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost:hover{border-color:var(--violet);color:var(--text)}
+@media (max-width:420px){.top .nav-r{gap:10px}.top a{font-size:.75rem}}
 @media (max-width:600px){article{padding:36px 16px 60px}body{font-size:1rem}}
+@media (max-width:600px){
+  figure{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-left:-16px;margin-right:-16px;padding:0 16px}
+  figure svg{min-width:620px}
+  figure:has(svg) figcaption{position:sticky;left:0;text-align:left}
+  figure:has(svg) figcaption::before{content:"← swipe to see the full diagram →  ";color:var(--violet)}
+}

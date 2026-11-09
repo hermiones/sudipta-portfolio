@@ -23,9 +23,10 @@
 <body>
 <header class="top"><div class="in">
   <a class="logo" href="/">SM<span>.</span></a>
-  <span style="display:flex;gap:18px">
+  <span class="nav-r">
     <a href="/#writing">← Portfolio</a>
     <a href="/Sudipta_Mohanty_Resume.pdf" download="Sudipta_Mohanty_Resume.pdf">Download CV</a>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Switch to light theme" title="Light / dark">☀</button>
   </span>
 </div></header>
 <article>
@@ -142,5 +143,10 @@
   <a class="btn ghost" href="https://github.com/hermiones" target="_blank" rel="noopener">GitHub ↗</a>
 </div>
 </article>
+<script>
+(()=>{const b=document.getElementById('themeBtn'),r=document.documentElement;
+ const sync=()=>{const l=r.dataset.theme==='light';b.textContent=l?'☾':'☀';b.setAttribute('aria-label',l?'Switch to dark theme':'Switch to light theme')};sync();
+ b.addEventListener('click',()=>{if(r.dataset.theme==='light')delete r.dataset.theme;else r.dataset.theme='light';try{localStorage.setItem('theme',r.dataset.theme||'dark')}catch(e){}sync()})})();
+</script>
 </body>
 </html>
