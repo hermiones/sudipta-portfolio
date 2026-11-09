@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Getting past a login CAPTCHA in automation with session replay · Sudipta Mohanty</title>
+<meta name="description" content="Capture one authenticated session, replay it into isolated test contexts, and skip expired sessions cleanly instead of failing.">
+<meta name="theme-color" content="#0A1018">
+<script>try{if(localStorage.getItem("theme")==="light")document.documentElement.dataset.theme="light"}catch(e){}</script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Getting past a login CAPTCHA in automation with session replay">
+<meta property="og:description" content="Capture one authenticated session, replay it into isolated test contexts, and skip expired sessions cleanly instead of failing.">
+<meta property="og:image" content="https://sudipta.site/photo.jpg">
+<meta property="og:url" content="https://sudipta.site/notes/captcha-session-replay.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://sudipta.site/notes/captcha-session-replay.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1'%3E%3Cstop offset='0' stop-color='%234DA3FF'/%3E%3Cstop offset='1' stop-color='%23FFB547'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='%230A1018'/%3E%3Ctext x='32' y='42' font-family='monospace' font-size='28' font-weight='700' text-anchor='middle' fill='url(%23g)'%3ESM%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/article.css">
+</head>
+<body>
+<header class="top"><div class="in">
+  <a class="logo" href="/">SM<span>.</span></a>
+  <span style="display:flex;gap:18px">
+    <a href="/#writing">← Portfolio</a>
+    <a href="/Sudipta_Mohanty_Resume.pdf" download="Sudipta_Mohanty_Resume.pdf">Download CV</a>
+  </span>
+</div></header>
+<article>
+<div class="kicker">Note · Playwright</div>
+<h1>Getting past a login CAPTCHA in automation with session replay</h1>
+<p class="lede">A server-side CAPTCHA on the login page is good security and a real obstacle for UI automation. Here's how I made the suite reliable without weakening the app.</p>
+<div class="meta">Sudipta Mohanty · SDET · 4 min read</div>
+
+<h2>The problem</h2>
+<p>The web client I automate has a <b>server-side CAPTCHA</b> on sign-in. That's the right call for security, but it means an automated test can't simply type a username and password and log in. Every test that needed a logged-in user was at risk of failing at the very first step. Those failures say nothing about the product.</p>
+<p>I didn't want to ask for the CAPTCHA to be disabled in test environments, because then we'd be testing a different app from the one users get.</p>
+
+<h2>The approach: capture once, replay everywhere</h2>
+<ol>
+  <li><b>Capture.</b> One authenticated session is created once and saved. In Playwright that's the browser's storage state: cookies and local storage.</li>
+  <li><b>Replay.</b> Every test starts in its own <b>isolated browser context</b> that is pre-loaded with the saved session, so it begins already signed in.</li>
+  <li><b>Validate.</b> Before the suite relies on the session, a quick check confirms it is still valid.</li>
+  <li><b>Skip cleanly.</b> If the session has expired, tests that need it are <b>skipped with a clear message</b> instead of failing.</li>
+</ol>
+
+<h2>What it looks like</h2>
+<p>A simplified illustration with Playwright for Python (not company code):</p>
+<pre># illustrative only
+import pytest
+from pathlib import Path
+
+STATE = Path(".auth/session.json")
+
+@pytest.fixture(scope="session")
+def auth_state(browser, base_url):
+    if not STATE.exists():
+        pytest.skip("No saved session. Capture one first (see README).")
+    ctx = browser.new_context(storage_state=STATE)
+    page = ctx.new_page()
+    page.goto(base_url + "/dashboard")
+    expired = "login" in page.url
+    ctx.close()
+    if expired:
+        pytest.skip("Saved session has expired. Re-capture it, then re-run.")
+    return STATE
+
+@pytest.fixture
+def page(browser, auth_state):
+    ctx = browser.new_context(storage_state=auth_state)  # isolated per test
+    yield ctx.new_page()
+    ctx.close()</pre>
+
+<h2>Why "skip" instead of "fail"</h2>
+<p>An expired session is a <b>setup problem</b>, not a product defect. If those tests failed, the run would turn red for a reason that has nothing to do with the release, and someone would waste time triaging it. A skip with a clear message says exactly what's wrong and what to do: re-capture the session.</p>
+<div class="callout"><p>Result: <b>no false authentication failures</b> in the regression runs. A red test means something real.</p></div>
+
+<h2>Things to watch</h2>
+<ul>
+  <li><b>Treat the saved session like a secret.</b> Keep it out of version control and logs.</li>
+  <li><b>Keep contexts isolated.</b> Each test gets its own context, so one test's state can't leak into another's, even though they share a login.</li>
+  <li><b>Still test login itself.</b> Session replay is for everything after sign-in. The login flow and the CAPTCHA behaviour deserve their own targeted checks.</li>
+</ul>
+<p>This is one layer of the Playwright framework I describe in my <a href="/case-study.html">case study</a>, alongside <a href="/notes/classifying-test-failures.html">automatic failure classification</a>.</p>
+<nav class="next" aria-label="More writing">
+  <a href="/case-study.html"><small>Case study</small>How I cut regression time by 50%</a>
+  <a href="/notes/fan-out-fan-in-qa-agents.html"><small>Note</small>Fan-out, fan-in: how I use multiple Claude agents for QA</a>
+  <a href="/notes/classifying-test-failures.html"><small>Note</small>Every red test gets a label: classifying failures automatically</a>
+</nav>
+<div class="cta-row">
+  <a class="btn" href="/#contact">Contact me →</a>
+  <a class="btn ghost" href="https://www.linkedin.com/in/sudiptamohanty" target="_blank" rel="noopener">LinkedIn ↗</a>
+  <a class="btn ghost" href="https://github.com/hermiones" target="_blank" rel="noopener">GitHub ↗</a>
+</div>
+</article>
+</body>
+</html>

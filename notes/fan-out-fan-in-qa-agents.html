@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fan-out, fan-in: how I use multiple Claude agents for QA · Sudipta Mohanty</title>
+<meta name="description" content="How a fan-out/fan-in pipeline of Claude agents handles test generation, defect triage and QA reporting, and where humans stay in the loop.">
+<meta name="theme-color" content="#0A1018">
+<script>try{if(localStorage.getItem("theme")==="light")document.documentElement.dataset.theme="light"}catch(e){}</script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Fan-out, fan-in: how I use multiple Claude agents for QA">
+<meta property="og:description" content="How a fan-out/fan-in pipeline of Claude agents handles test generation, defect triage and QA reporting, and where humans stay in the loop.">
+<meta property="og:image" content="https://sudipta.site/photo.jpg">
+<meta property="og:url" content="https://sudipta.site/notes/fan-out-fan-in-qa-agents.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://sudipta.site/notes/fan-out-fan-in-qa-agents.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1'%3E%3Cstop offset='0' stop-color='%234DA3FF'/%3E%3Cstop offset='1' stop-color='%23FFB547'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='%230A1018'/%3E%3Ctext x='32' y='42' font-family='monospace' font-size='28' font-weight='700' text-anchor='middle' fill='url(%23g)'%3ESM%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/article.css">
+</head>
+<body>
+<header class="top"><div class="in">
+  <a class="logo" href="/">SM<span>.</span></a>
+  <span style="display:flex;gap:18px">
+    <a href="/#writing">← Portfolio</a>
+    <a href="/Sudipta_Mohanty_Resume.pdf" download="Sudipta_Mohanty_Resume.pdf">Download CV</a>
+  </span>
+</div></header>
+<article>
+<div class="kicker">Note · AI-assisted QA</div>
+<h1>Fan-out, fan-in: how I use multiple Claude agents for QA</h1>
+<p class="lede">One big prompt that does everything gives shallow results. Splitting QA work across focused agents, then merging their output, works far better.</p>
+<div class="meta">Sudipta Mohanty · SDET · 5 min read</div>
+
+<h2>The idea</h2>
+<p><b>Fan-out, fan-in</b> is a simple pattern. An orchestrator takes a task, splits it into independent pieces, hands each piece to a specialist agent working in parallel (fan-out), then collects and merges the results into one answer (fan-in).</p>
+<p>I use this pattern with Claude for three repetitive parts of QA: <b>test-case generation, defect triage and QA reporting</b>, across the product lines I test at Iskraemeco. The scripts around it were developed with Cursor AI.</p>
+
+<pre>              ┌─► planner   ── scenarios from the requirement
+              ├─► test-gen  ── test cases in our format
+orchestrator ─┼─► triage    ── classify failures from the run
+              └─► reporter  ── summary for the release
+                     │
+              fan-in ▼  merge · de-duplicate · human review</pre>
+
+<h2>Why split the work?</h2>
+<ul>
+  <li><b>Focus beats breadth.</b> An agent asked only to find edge cases for one requirement does that job much better than one asked to "test this feature".</li>
+  <li><b>Parallel is faster.</b> Independent pieces don't wait on each other.</li>
+  <li><b>Easier to check.</b> Small, specific outputs are quicker for a human to review than one long answer.</li>
+  <li><b>Easier to improve.</b> If triage is weak, I fix the triage agent's instructions without touching the others.</li>
+</ul>
+
+<h2>What each agent does</h2>
+<h3>Test generation</h3>
+<p>Given a requirement, the agent proposes scenarios: the happy path, boundary values, invalid input and permission cases. The output uses the same structure as our existing test cases, so it slots into the suite instead of becoming a separate document.</p>
+<h3>Defect triage</h3>
+<p>Given a failed run (error, logs, screenshot description), the agent proposes a category and a one-line reason. This sits on top of the rule-based classification I describe in <a href="/notes/classifying-test-failures.html">classifying test failures</a>.</p>
+<h3>Reporting</h3>
+<p>Given the run results, the agent writes a short QA summary for the release: what passed, what failed, what's blocked and what needs a decision.</p>
+
+<h2>Where the human stays in the loop</h2>
+<div class="callout"><p>Agents draft; people decide. Nothing an agent produces goes into the suite, the defect register or a release report without a review.</p></div>
+<p>The fan-in step is where that happens. Results are merged and de-duplicated, then reviewed. Generated tests still go through PR review, and triage suggestions are confirmed before a defect is raised.</p>
+
+<h2>Results</h2>
+<div class="kpis">
+  <div class="kpi"><b>−40%</b><span>Manual QA overhead per sprint</span></div>
+  <div class="kpi"><b>−40%</b><span>Sprint defect escape rate</span></div>
+</div>
+<p>The time saved goes back into the work that needs judgement: exploratory testing, risk analysis and reviewing what matters.</p>
+
+<h2>What I've learned</h2>
+<ul>
+  <li><b>Give each agent one job and a fixed output format.</b> Structured output is far easier to merge and review.</li>
+  <li><b>Feed real context.</b> Requirements, existing test cases and past defects make the output specific instead of generic.</li>
+  <li><b>Measure it like any other process change.</b> If it doesn't reduce effort or escaped defects, it's a demo, not a tool.</li>
+</ul>
+<p>You can see a live visualisation of this pipeline on my portfolio: <a href="/#swarm">the Agent Swarm demo</a>.</p>
+<nav class="next" aria-label="More writing">
+  <a href="/case-study.html"><small>Case study</small>How I cut regression time by 50%</a>
+  <a href="/notes/classifying-test-failures.html"><small>Note</small>Every red test gets a label: classifying failures automatically</a>
+  <a href="/notes/captcha-session-replay.html"><small>Note</small>Getting past a login CAPTCHA in automation with session replay</a>
+</nav>
+<div class="cta-row">
+  <a class="btn" href="/#contact">Contact me →</a>
+  <a class="btn ghost" href="https://www.linkedin.com/in/sudiptamohanty" target="_blank" rel="noopener">LinkedIn ↗</a>
+  <a class="btn ghost" href="https://github.com/hermiones" target="_blank" rel="noopener">GitHub ↗</a>
+</div>
+</article>
+</body>
+</html>

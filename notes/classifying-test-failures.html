@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Every red test gets a label: classifying failures automatically · Sudipta Mohanty</title>
+<meta name="description" content="Sorting every test failure into product defect, UI change, environment, data or test issue, so the defect register only holds real findings.">
+<meta name="theme-color" content="#0A1018">
+<script>try{if(localStorage.getItem("theme")==="light")document.documentElement.dataset.theme="light"}catch(e){}</script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Every red test gets a label: classifying failures automatically">
+<meta property="og:description" content="Sorting every test failure into product defect, UI change, environment, data or test issue, so the defect register only holds real findings.">
+<meta property="og:image" content="https://sudipta.site/photo.jpg">
+<meta property="og:url" content="https://sudipta.site/notes/classifying-test-failures.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://sudipta.site/notes/classifying-test-failures.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1'%3E%3Cstop offset='0' stop-color='%234DA3FF'/%3E%3Cstop offset='1' stop-color='%23FFB547'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='%230A1018'/%3E%3Ctext x='32' y='42' font-family='monospace' font-size='28' font-weight='700' text-anchor='middle' fill='url(%23g)'%3ESM%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/article.css">
+</head>
+<body>
+<header class="top"><div class="in">
+  <a class="logo" href="/">SM<span>.</span></a>
+  <span style="display:flex;gap:18px">
+    <a href="/#writing">← Portfolio</a>
+    <a href="/Sudipta_Mohanty_Resume.pdf" download="Sudipta_Mohanty_Resume.pdf">Download CV</a>
+  </span>
+</div></header>
+<article>
+<div class="kicker">Note · Test reliability</div>
+<h1>Every red test gets a label: classifying failures automatically</h1>
+<p class="lede">A failed test is a question, not an answer. Classifying every failure automatically means the defect register only holds real findings, and triage stops being a daily chore.</p>
+<div class="meta">Sudipta Mohanty · SDET · 5 min read</div>
+
+<h2>The problem with "it's red"</h2>
+<p>When a regression run fails, someone has to open each failure and work out what happened. Most failures in a large suite are <b>not product bugs</b>. A locator changed, the test environment was slow, the data was stale or the test itself was wrong. If those all land in the defect register, developers stop trusting it.</p>
+
+<h2>Five categories</h2>
+<p>In the Playwright framework I built, every failure is classified into one of five buckets:</p>
+<table>
+  <thead><tr><th>Category</th><th>Meaning</th><th>Typical signal</th></tr></thead>
+  <tbody>
+    <tr><td><b>Product defect</b></td><td>The app did the wrong thing</td><td>Assertion on behaviour or data failed with the page working normally</td></tr>
+    <tr><td><b>UI change</b></td><td>The screen changed, the test didn't</td><td>Locator not found, element changed</td></tr>
+    <tr><td><b>Environment</b></td><td>The test bed was unhealthy</td><td>Timeouts, 5xx responses, connection errors</td></tr>
+    <tr><td><b>Data</b></td><td>Test data was missing or stale</td><td>Expected record absent, setup data invalid</td></tr>
+    <tr><td><b>Test issue</b></td><td>The test itself is wrong</td><td>Errors inside test code or fixtures</td></tr>
+  </tbody>
+</table>
+<p>Only <b>product defects</b> go to the defect register. The other categories are routed to whoever can fix them: test owners, environment owners or data setup.</p>
+
+<h2>How it works</h2>
+<p>The classifier hooks into Pytest's reporting step. When a test fails, it looks at the exception type, the message and where the error came from, then attaches the evidence. Here's a simplified illustration of the idea (not company code):</p>
+<pre># conftest.py: illustrative only
+import pytest
+
+def classify(exc, text):
+    if "Timeout" in type(exc).__name__ and "locator" in text:
+        return "UI change"
+    if any(s in text for s in ("ERR_CONNECTION", " 502", " 503", "net::")):
+        return "Environment"
+    if "test data" in text or "fixture" in text:
+        return "Data"
+    if isinstance(exc, AssertionError):
+        return "Product defect"
+    return "Test issue"
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    report = outcome.get_result()
+    if report.when == "call" and report.failed:
+        text = str(call.excinfo.value)
+        report.category = classify(call.excinfo.value, text)
+        # attach screenshot, trace and video for this test here</pre>
+<p>Real rules are richer than this, but the shape is the same: <b>cheap, explainable rules first</b>, with evidence attached so a human can confirm a category in seconds.</p>
+
+<h2>Evidence makes it trustworthy</h2>
+<p>Every failure comes with a <b>screenshot, a Playwright trace and video</b>. A label alone isn't enough. People need to see why the classifier decided what it did. With the trace open, confirming "UI change" or "product defect" is a few seconds' work instead of a re-run.</p>
+
+<h2>What changed</h2>
+<ul>
+  <li>The defect register holds real findings, so developers take it seriously.</li>
+  <li>Triage time drops, because most failures arrive pre-sorted with evidence attached.</li>
+  <li>Patterns become visible. A spike in "Environment" failures is an infrastructure conversation, not twenty bug tickets.</li>
+</ul>
+<div class="callout"><p>Rules handle the obvious cases. For the ambiguous ones I add an AI triage step that suggests a category with a reason, which is always confirmed by a person. <a href="/notes/fan-out-fan-in-qa-agents.html">More on that →</a></p></div>
+<nav class="next" aria-label="More writing">
+  <a href="/case-study.html"><small>Case study</small>How I cut regression time by 50%</a>
+  <a href="/notes/fan-out-fan-in-qa-agents.html"><small>Note</small>Fan-out, fan-in: how I use multiple Claude agents for QA</a>
+  <a href="/notes/captcha-session-replay.html"><small>Note</small>Getting past a login CAPTCHA in automation with session replay</a>
+</nav>
+<div class="cta-row">
+  <a class="btn" href="/#contact">Contact me →</a>
+  <a class="btn ghost" href="https://www.linkedin.com/in/sudiptamohanty" target="_blank" rel="noopener">LinkedIn ↗</a>
+  <a class="btn ghost" href="https://github.com/hermiones" target="_blank" rel="noopener">GitHub ↗</a>
+</div>
+</article>
+</body>
+</html>
