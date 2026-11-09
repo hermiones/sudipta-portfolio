@@ -640,6 +640,9 @@ section>.wrap{transform-style:flat;backface-visibility:hidden}
 .cheer{position:fixed;z-index:260;pointer-events:none;font-family:var(--mono);font-weight:700;color:var(--pass);animation:cheer 1.6s cubic-bezier(.2,.8,.2,1) forwards}
 @keyframes cheer{to{transform:translate(var(--x),var(--y)) rotate(var(--r));opacity:0}}
 
+.repos{grid-auto-flow:dense}
+.demo-link{display:inline-block;margin-top:16px;font-size:.85rem;color:var(--red);border-bottom:1px dashed}
+.demo-link:hover{color:var(--cta)}
 .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s}
 .reveal.in{opacity:1;transform:none}
 
@@ -835,6 +838,7 @@ sdet · scrum master <span class="cursor"></span></pre>
           <li>Local RAG over product docs (FAISS + sentence-transformers + Claude) for cited spec and OBIS lookups.</li>
         </ul>
         <div class="chips"><span class="chip">Playwright</span><span class="chip">Pytest</span><span class="chip">Allure</span><span class="chip">Claude</span><span class="chip">FAISS</span><span class="chip">RAG</span></div>
+        <a class="demo-link mono" href="https://github.com/hermiones/agentic-qa-framework" target="_blank" rel="noopener">▶ See a public demo of this approach on GitHub ↗</a>
       </div>
       <div class="side">
         <div class="mono" style="font-size:.75rem;color:var(--muted)">CLICK A LAYER TO INSPECT ↓</div>
@@ -937,9 +941,10 @@ sdet · scrum master <span class="cursor"></span></pre>
 <section id="code">
   <div class="wrap">
     <div class="sec-head reveal"><span class="n">06 / CODE</span><h2>On GitHub</h2><span class="lbl">REAL REPOS</span></div>
-    <p class="sw-intro reveal">My company work is under NDA, so here's code you can open: two AI products I built end to end, plus the test frameworks and QA tools I use.</p>
+    <p class="sw-intro reveal">My company work is under NDA, so here's code you can open: a public version of my agentic QA framework, two AI products I built end to end, and the test frameworks and QA tools I use.</p>
     <div class="repos">
-      <a class="repo feat" href="https://github.com/hermiones/JobPilot" target="_blank" rel="noopener"><div class="top mono"><span class="id">FEATURED · AI PRODUCT</span><span>↗</span></div><h4>JobPilot</h4><p>A full-stack job application assistant. It pulls listings from Greenhouse, Lever and RemoteOK, scores them against your profile, and tailors cover letters with AI (with A/B/C variant testing). It has multi-user accounts, a pipeline tracker and an admin dashboard, and the final apply click is never automated.</p><span class="chip">Next.js · TypeScript · Prisma · Postgres · LLMs</span></a>
+      <a class="repo feat qa" href="https://github.com/hermiones/agentic-qa-framework" target="_blank" rel="noopener"><div class="top mono"><span class="id">FEATURED · QA FRAMEWORK · CI ✓</span><span>↗</span></div><h4>agentic-qa-framework</h4><p>A public, sanitised version of the framework approach I use at work: Playwright + Pytest with Page Objects, <b>session capture &amp; replay</b> to get past a login CAPTCHA, <b>automatic failure classification</b> (product defect / UI change / environment / data / test issue) that writes a clean defect log, and <b>requirement traceability</b> reports. CI runs it on Chromium, Firefox and WebKit.</p><span class="chip">Python · Playwright · Pytest · GitHub Actions</span></a>
+      <a class="repo feat" href="https://github.com/hermiones/JobPilot" target="_blank" rel="noopener"><div class="top mono"><span class="id">AI PRODUCT</span><span>↗</span></div><h4>JobPilot</h4><p>A full-stack job application assistant. It pulls listings from Greenhouse, Lever and RemoteOK, scores them against your profile, and tailors cover letters with AI (with A/B/C variant testing). It has multi-user accounts, a pipeline tracker and an admin dashboard, and the final apply click is never automated.</p><span class="chip">Next.js · TypeScript · Prisma · Postgres · LLMs</span></a>
       <a class="repo" href="https://github.com/hermiones/AIJobApplier" target="_blank" rel="noopener"><div class="top mono"><span class="id">AI AGENT</span><span>↗</span></div><h4>AIJobApplier</h4><p>An AI job-application agent that scrapes, scores, sends outreach and tracks applications. It has a FastAPI + PostgreSQL backend, Celery workers, Apify scraping and a LiteLLM/Gemini AI service, and the whole stack runs with Docker Compose.</p><span class="chip">FastAPI · Celery · Redis · LangGraph · Docker</span></a>
       <a class="repo" href="https://github.com/hermiones/API-TEST-FRAMEWORK" target="_blank" rel="noopener"><div class="top mono"><span class="id">API TESTING</span><span>↗</span></div><h4>API-TEST-FRAMEWORK</h4><p>A configurable REST API test framework with YAML/.env config, a retry decorator with logging, Faker test data, RabbitMQ messaging checks, and Allure + HTML reports ready for CI artifacts.</p><span class="chip">Pytest · Requests · RabbitMQ · Allure</span></a>
       <a class="repo" href="https://github.com/hermiones/TravelWebsiteAutomationTest" target="_blank" rel="noopener"><div class="top mono"><span class="id">UI AUTOMATION</span><span>↗</span></div><h4>TravelWebsiteAutomationTest</h4><p>An end-to-end framework for the BlazeDemo travel site, built with Page Object Model and externalised test data. It includes negative tests, Allure reports with screenshots on failure, and a GitHub Actions CI pipeline.</p><span class="chip">Selenium · Pytest · POM · GitHub Actions</span></a>
