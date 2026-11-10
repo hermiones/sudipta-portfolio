@@ -17,6 +17,7 @@ if(!location.hash&&!matchMedia("(prefers-reduced-motion: reduce)").matches&&!(nv
 <link rel="canonical" href="https://sudipta.site/">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1'%3E%3Cstop offset='0' stop-color='%2322d3ee'/%3E%3Cstop offset='1' stop-color='%23a78bfa'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='%23070b16'/%3E%3Ctext x='32' y='42' font-family='monospace' font-size='28' font-weight='700' text-anchor='middle' fill='url(%23g)'%3ESM%3C/text%3E%3C/svg%3E">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -695,6 +696,229 @@ nav .navsoc{display:none}
   section{padding:72px 0}
   .hero{padding-top:56px}
 }
+
+/* ===== round 8: circular theme reveal, locator inspector, coverage gutter, 3D test pyramid ===== */
+::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
+::view-transition-new(root){z-index:2}
+
+/* locator inspector (always a dark "devtools" panel, like the terminal cards) */
+.insp-box,.insp-tag,.insp-bar{display:none}
+body.inspecting .insp-box.on,body.inspecting .insp-tag.on{display:block}
+body.inspecting .insp-bar{display:flex}
+.insp-box{position:fixed;top:0;left:0;z-index:9996;pointer-events:none;border:1.5px solid #22d3ee;background:rgba(34,211,238,.1);border-radius:3px;box-shadow:0 0 0 9999px rgba(5,8,14,.18)}
+.insp-tag{position:fixed;top:0;left:0;z-index:9997;pointer-events:none;max-width:min(620px,calc(100vw - 24px));font:500 .75rem/1.45 var(--mono);color:#e8eefc;background:#0b1222;border:1px solid #22d3ee;border-radius:6px;padding:6px 10px;box-shadow:0 12px 32px rgba(0,0,0,.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.insp-tag .p{color:#93a1bf}.insp-tag .m{color:#22d3ee}.insp-tag .s{color:#34d399}.insp-tag .k{color:#c4b5fd}
+.insp-tag .cnt{margin-left:10px;padding:1px 7px;border-radius:99px;font-size:.68rem;background:rgba(52,211,153,.15);color:#34d399}
+.insp-tag .cnt.warn{background:rgba(251,191,36,.15);color:#fbbf24}
+.insp-bar{position:fixed;top:78px;left:50%;transform:translateX(-50%);z-index:9995;align-items:center;gap:12px;font-size:.75rem;color:#e8eefc;background:#0b1222;border:1px solid #22d3ee;border-radius:99px;padding:7px 8px 7px 16px;box-shadow:0 14px 40px rgba(0,0,0,.45);max-width:calc(100vw - 24px);white-space:nowrap}
+.insp-bar b{color:#22d3ee}
+.insp-bar kbd{font:inherit;border:1px solid #1d2a44;border-radius:4px;padding:0 5px}
+.insp-bar button{flex:none;width:26px;height:26px;border-radius:50%;border:1px solid #1d2a44;background:transparent;color:#93a1bf;cursor:pointer}
+.insp-bar button:hover{color:#fff;border-color:#fff}
+@media (max-width:700px){.insp-bar .hint{display:none}}
+
+/* coverage gutter: an lcov-style strip on the left edge */
+.cov{position:fixed;left:0;top:0;bottom:0;width:4px;z-index:85;display:flex;flex-direction:column;gap:1px;pointer-events:none}
+.cov i{flex:1;background:color-mix(in srgb,var(--line) 80%,transparent);transition:background .5s,box-shadow .5s}
+.cov i.part{background:var(--warn)}
+.cov i.hit{background:var(--pass);box-shadow:0 0 6px color-mix(in srgb,var(--pass) 55%,transparent)}
+.cov-view{position:absolute;left:0;width:8px;border:1px solid color-mix(in srgb,var(--text) 45%,transparent);border-left:0;border-radius:0 3px 3px 0;transition:top .15s linear}
+.cov-badge{position:fixed;left:18px;bottom:24px;z-index:90;display:flex;align-items:center;gap:8px;font-size:.72rem;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:7px 12px;cursor:pointer;transition:border-color .2s,color .2s}
+.cov-badge:hover{color:var(--text);border-color:var(--pass)}
+.cov-badge b{color:var(--text);min-width:3ch;text-align:right}
+.cov-bar{width:46px;height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+.cov-bar i{display:block;height:100%;width:0;background:var(--pass);transition:width .5s}
+.cov-badge.full{border-color:var(--pass)}.cov-badge.full b{color:var(--pass)}
+@media (max-width:900px){.cov-badge{display:none}.cov{width:3px}}
+
+/* 3D test pyramid */
+.pyr-wrap{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center;margin-top:56px;border:1px solid var(--line);background:var(--card);padding:28px}
+.pyr-scene{position:relative;height:380px;perspective:1000px;perspective-origin:50% 30%;overflow:hidden;cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none;outline:none;border-radius:10px;background:radial-gradient(60% 55% at 50% 62%,color-mix(in srgb,var(--red) 9%,transparent),transparent 70%)}
+.pyr-scene.dragging{cursor:grabbing}
+.pyr-scene:focus-visible{box-shadow:0 0 0 2px var(--red)}
+.pyr-hint{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);font-size:.7rem;color:var(--muted);pointer-events:none;white-space:nowrap}
+.pyr{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d;--g:0px}
+.pyr-wrap.exp .pyr{--g:24px}
+.pyr-floor{position:absolute;width:300px;height:300px;left:-150px;top:-150px;transform:translateY(116px) rotateX(90deg);border-radius:50%;
+ background:radial-gradient(closest-side,color-mix(in srgb,var(--red) 22%,transparent),transparent),repeating-linear-gradient(0deg,color-mix(in srgb,var(--red) 20%,transparent) 0 1px,transparent 1px 30px),repeating-linear-gradient(90deg,color-mix(in srgb,var(--red) 20%,transparent) 0 1px,transparent 1px 30px);
+ -webkit-mask:radial-gradient(closest-side,#000 55%,transparent);mask:radial-gradient(closest-side,#000 55%,transparent)}
+.slab{position:absolute;transform-style:preserve-3d;transform:translateY(calc(var(--y) - (var(--i) - 1.5) * var(--g)));
+ transition:transform .55s cubic-bezier(.2,.8,.2,1),translate .9s cubic-bezier(.3,1.35,.5,1) calc(var(--i) * .2s),opacity .5s calc(var(--i) * .2s)}
+.pyr-wrap:not(.built) .slab{translate:0 -280px;opacity:0}
+.slab.on{transform:translateY(calc(var(--y) - (var(--i) - 1.5) * var(--g) - 12px))}
+.slab .f{position:absolute;left:calc(var(--w) / -2);top:calc(var(--h) / -2);width:var(--w);height:var(--h);display:grid;place-items:center;
+ font:600 .62rem/1 var(--mono);letter-spacing:.12em;color:var(--c);backface-visibility:hidden;-webkit-backface-visibility:hidden;
+ background:linear-gradient(180deg,color-mix(in srgb,var(--c) 34%,var(--card)),color-mix(in srgb,var(--c) 14%,var(--card)));border:1px solid color-mix(in srgb,var(--c) 70%,transparent);transition:box-shadow .3s,border-color .3s}
+.slab .f::after{content:"";position:absolute;inset:0;background:#000;opacity:calc((1 - var(--L,1)) * .62);pointer-events:none}
+.slab .tp,.slab .bt{top:calc(var(--w) / -2);height:var(--w);font-size:0}
+.slab .tp{background:linear-gradient(135deg,color-mix(in srgb,var(--c) 46%,var(--card)),color-mix(in srgb,var(--c) 22%,var(--card)));
+ background-image:repeating-linear-gradient(0deg,color-mix(in srgb,var(--c) 30%,transparent) 0 1px,transparent 1px 18px),repeating-linear-gradient(90deg,color-mix(in srgb,var(--c) 30%,transparent) 0 1px,transparent 1px 18px),linear-gradient(135deg,color-mix(in srgb,var(--c) 46%,var(--card)),color-mix(in srgb,var(--c) 22%,var(--card)))}
+.slab .fr{transform:translateZ(calc(var(--w) / 2));--L:var(--l0)}
+.slab .rt{transform:rotateY(90deg) translateZ(calc(var(--w) / 2));--L:var(--l1)}
+.slab .bk{transform:rotateY(180deg) translateZ(calc(var(--w) / 2));--L:var(--l2)}
+.slab .lf{transform:rotateY(-90deg) translateZ(calc(var(--w) / 2));--L:var(--l3)}
+.slab .tp{transform:rotateX(90deg) translateZ(calc(var(--h) / 2))}
+.slab .bt{transform:rotateX(-90deg) translateZ(calc(var(--h) / 2));--L:.25}
+.slab.on .f{border-color:var(--c);box-shadow:0 0 26px color-mix(in srgb,var(--c) 45%,transparent)}
+.pyr-k{font-size:.75rem;color:var(--red);letter-spacing:.12em}
+.pyr-copy h3{font-size:1.5rem;margin:8px 0 10px}
+.pyr-copy>p{color:var(--muted);font-size:.95rem;margin-bottom:20px}
+.pyr-leg{list-style:none;display:grid;gap:8px}
+.pyr-leg li{display:grid;grid-template-columns:12px 1fr auto;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:8px;cursor:default;transition:border-color .25s,background .25s,transform .25s}
+.pyr-leg li i{width:12px;height:12px;border-radius:3px;background:var(--c);box-shadow:0 0 10px color-mix(in srgb,var(--c) 50%,transparent)}
+.pyr-leg b{display:block;font-size:.85rem;color:var(--text);font-weight:600}
+.pyr-leg em{font-style:normal;font-size:.72rem;color:var(--muted)}
+.pyr-leg .ok{font-size:.72rem;color:var(--pass);opacity:0;transition:opacity .4s calc(1s + (3 - var(--i)) * .2s)}
+.pyr-wrap.built .pyr-leg .ok{opacity:1}
+.pyr-leg li.on,.pyr-leg li:focus-visible{border-color:var(--c);background:color-mix(in srgb,var(--c) 8%,transparent);transform:translateX(4px);outline:none}
+@media (max-width:900px){.pyr-wrap{grid-template-columns:1fr;gap:24px}}
+@media (max-width:600px){.pyr-wrap{padding:18px}.pyr-scene{height:300px}.pyr{scale:.66}}
+
+/* ===== Testy: original 3D mascot, fixed bottom-right, with an "Ask Testy" chat ===== */
+.buddy{position:fixed;right:34px;bottom:88px;width:96px;height:132px;z-index:201;perspective:420px;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;transform-origin:100% 100%}
+.buddy:focus-visible .b-ball{outline:2px solid var(--red);outline-offset:3px}
+.buddy::after{content:"";position:absolute;left:24px;right:24px;bottom:2px;height:9px;border-radius:50%;background:rgba(0,0,0,.45);filter:blur(3px);z-index:-1}
+.b-rig{position:absolute;inset:0;animation:bbob 3.2s ease-in-out infinite}
+@keyframes bbob{50%{translate:0 -5px}}
+.buddy.hop .b-rig{animation:bhop .6s cubic-bezier(.3,1.6,.5,1)}
+@keyframes bhop{30%{translate:0 -22px;scale:1.04 .96}65%{translate:0 0;scale:1.07 .92}}
+/* body: chibi proportions, big head and a tiny soft body */
+.b-rig{transform-origin:50% 100%}
+.b-body{position:absolute;left:50%;bottom:10px;width:52px;height:42px;margin-left:-26px;border-radius:24px 24px 18px 18px;
+ background:radial-gradient(circle at 34% 22%,#ffe4d8 0,#f9b69d 24%,#ef9473 52%,#c96b4c 100%);
+ box-shadow:inset -6px -8px 12px rgba(150,60,30,.32),inset 4px 4px 8px rgba(255,238,230,.5),0 8px 14px rgba(0,0,0,.26)}
+.b-body::before,.b-body::after{content:"";position:absolute;bottom:-6px;width:17px;height:11px;border-radius:50%;background:radial-gradient(circle at 40% 30%,#f2a084,#b8593d)}
+.b-body::before{left:7px}.b-body::after{right:7px}
+.b-arm{position:absolute;top:9px;width:13px;height:19px;border-radius:50%;background:radial-gradient(circle at 40% 30%,#fcc4ae,#de7d5e);box-shadow:inset -2px -3px 4px rgba(150,60,30,.28);transform-origin:50% 15%}
+.b-arm.l{left:-6px;transform:rotate(26deg)}.b-arm.r{right:-6px;transform:rotate(-26deg)}
+.buddy.happy .b-arm.r,.buddy[data-emo=excited] .b-arm,.buddy[data-emo=love] .b-arm.r{animation:bwave .45s ease-in-out 3}
+.buddy[data-emo=excited] .b-arm.l{animation-name:bwavel}
+@keyframes bwave{50%{transform:rotate(-150deg)}}
+@keyframes bwavel{50%{transform:rotate(150deg)}}
+/* office ID card on a lanyard */
+.b-lan{position:absolute;left:50%;top:-2px;width:30px;height:18px;margin-left:-15px;border:2.5px solid #22d3ee;border-top:0;border-radius:0 0 50% 50%;opacity:.9}
+.b-id{position:absolute;left:50%;top:12px;width:30px;height:25px;margin-left:-15px;border-radius:3px;background:#f8fafc;box-shadow:0 2px 4px rgba(0,0,0,.3);transform-origin:50% -6px;transform:rotate(var(--swing,0deg));overflow:hidden}
+.b-id::before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:linear-gradient(90deg,#22d3ee,#a78bfa)}
+.b-id::after{content:"";position:absolute;left:50%;top:-3px;width:8px;height:4px;margin-left:-4px;border-radius:2px;background:#64748b}
+.b-id i{position:absolute;left:2px;top:7px;width:9px;height:11px;border-radius:2px;background:radial-gradient(circle at 50% 38%,#ef9473 0 30%,transparent 32%),radial-gradient(ellipse at 50% 120%,#ef9473 0 45%,transparent 47%),#e2e8f0}
+.b-id b{position:absolute;left:13px;top:7px;font:800 .3rem/1.25 var(--mono);color:#0f172a;letter-spacing:.02em}
+.b-id b em{display:block;font-style:normal;font-weight:600;color:#0E7490}
+.b-id u{position:absolute;left:2px;right:2px;bottom:2px;height:3px;background:repeating-linear-gradient(90deg,#0f172a 0 1px,transparent 1px 2px,#0f172a 2px 3.5px,transparent 3.5px 4.5px)}
+/* head: a soft, slightly squishy peach ball */
+.b-head{position:absolute;left:50%;top:0;width:88px;height:84px;margin-left:-44px;transform-style:preserve-3d;transform:rotateZ(var(--tilt,0deg))}
+.b-ball{position:absolute;inset:0;border-radius:50% 50% 47% 47%/54% 54% 46% 46%;
+ background:radial-gradient(circle at 33% 25%,#fff3ed 0 5%,#ffcdb9 17%,#f9a98b 40%,#eb8a67 64%,#c4664a 100%);
+ box-shadow:inset -10px -12px 20px rgba(160,60,30,.34),inset 7px 7px 14px rgba(255,244,238,.55),inset -3px 0 8px rgba(103,232,249,.28),0 10px 22px rgba(0,0,0,.3)}
+.b-ball::after{content:"";position:absolute;left:16px;top:9px;width:24px;height:14px;border-radius:50%;background:radial-gradient(rgba(255,255,255,.95),rgba(255,255,255,0) 70%);transform:rotate(-28deg)}
+.b-turn{position:absolute;inset:0;transform-style:preserve-3d}
+.b-ear{position:absolute;top:33px;width:14px;height:21px;border-radius:7px;background:radial-gradient(circle at 40% 30%,#ddd6fe,#8b7be0);box-shadow:inset -2px -2px 4px rgba(40,20,90,.3);transform:translateZ(-2px)}
+.b-ear::after{content:"";position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px;border-radius:50%;background:#a5f3fc;box-shadow:0 0 5px #22d3ee}
+.b-ear.l{left:-7px}.b-ear.r{right:-7px}
+.b-ant{position:absolute;left:50%;top:-14px;width:3px;height:18px;margin-left:-1.5px;border-radius:2px;background:linear-gradient(#e07b5a,#b0553a);transform:translateZ(8px)}
+.b-ant i{position:absolute;left:50%;top:-9px;width:16px;height:16px;margin-left:-8px;background:#ffcf6e;clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%);filter:drop-shadow(0 0 4px #ffb347);animation:rot 6s linear infinite}
+.buddy[data-emo=excited] .b-ant i,.buddy[data-emo=listen] .b-ant i{animation-duration:1s;scale:1.3}
+/* face: big glossy cartoon eyes, ω mouth, blush */
+.b-face{position:absolute;left:14px;right:14px;top:30px;height:36px;transform:translateZ(38px)}
+.b-leds{position:absolute;inset:0;transform:translate(var(--ex,0),var(--ey,0))}
+.b-eye{position:absolute;top:4px;width:14px;height:17px;border-radius:50%;background:radial-gradient(circle at 50% 62%,#4a2c25,#1c0f0c 70%);transition:transform .07s,height .15s,top .15s}
+.b-eye::before{content:"";position:absolute;right:2px;top:2.5px;width:5.5px;height:5.5px;border-radius:50%;background:#fff}
+.b-eye::after{content:"";position:absolute;left:3px;bottom:3px;width:2.5px;height:2.5px;border-radius:50%;background:rgba(255,255,255,.85)}
+.b-eye.l{left:5px}.b-eye.r{right:5px}
+.buddy.blink:not([data-emo=excited]):not([data-emo=love]):not([data-emo=laugh]) .b-eye{transform:scaleY(.1)}
+.b-mouth{position:absolute;left:50%;top:22px;width:13px;height:8px;margin-left:-6.5px;overflow:visible;transform-origin:50% 25%;transition:transform .3s cubic-bezier(.3,1.5,.5,1),scale .06s}
+.b-mouth path{display:none;fill:none;stroke:#3a1a14;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.b-mouth .m-smile{display:block}
+.b-mouth .m-open{fill:#7a2a22;stroke-width:1.8}
+.b-mouth .m-tongue{fill:#ff8fa3;stroke:none}
+.buddy.near .b-mouth{transform:scale(1.25,1.3)}
+.b-cheek{position:absolute;top:55px;width:14px;height:8px;border-radius:50%;background:radial-gradient(#ff8fa3 0,rgba(255,143,163,0) 70%);opacity:.8;transform:translateZ(32px);transition:opacity .3s,scale .3s}
+.b-cheek.l{left:9px}.b-cheek.r{right:9px}
+.buddy.near .b-cheek,.buddy.happy .b-cheek{opacity:1}
+.b-tear{display:none;position:absolute;left:9px;top:21px;width:6px;height:8px;border-radius:50% 50% 50% 50%/40% 40% 60% 60%;background:linear-gradient(#e0f7ff,#7dd3fc)}
+.b-fx{position:absolute;left:50%;top:6px;font-size:13px;line-height:1;pointer-events:none;z-index:2;animation:bfx 1.3s ease-out both;text-shadow:0 0 6px currentColor}
+@keyframes bfx{from{opacity:0;transform:translate(-50%,12px) scale(.5)}20%{opacity:1}to{opacity:0;transform:translate(calc(-50% + var(--x)),-48px) scale(1.25)}}
+/* ---- emotions (data-emo on .buddy) ---- */
+.buddy.happy:not([data-emo]) .b-eye,.buddy[data-emo=happy] .b-eye,.buddy[data-emo=wink] .b-eye.l{background:transparent;height:13px;top:8px;border:3px solid transparent;border-top-color:#2a1712;border-radius:50%;transform:none}
+.buddy.happy:not([data-emo]) .b-eye::before,.buddy.happy:not([data-emo]) .b-eye::after,.buddy[data-emo=happy] .b-eye::before,.buddy[data-emo=happy] .b-eye::after,.buddy[data-emo=wink] .b-eye.l::before,.buddy[data-emo=wink] .b-eye.l::after,
+.buddy[data-emo=excited] .b-eye::before,.buddy[data-emo=excited] .b-eye::after,.buddy[data-emo=love] .b-eye::before,.buddy[data-emo=love] .b-eye::after,.buddy[data-emo=laugh] .b-eye::before,.buddy[data-emo=laugh] .b-eye::after{display:none}
+.buddy[data-emo=excited] .b-eye{background:#ffcf4a;width:18px;height:18px;top:2px;border-radius:0;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);animation:bstar .5s ease-in-out infinite alternate}
+.buddy[data-emo=excited] .b-eye.l{left:3px}.buddy[data-emo=excited] .b-eye.r{right:3px}
+.buddy[data-emo=excited] .b-leds{filter:drop-shadow(0 0 3px #ffb347)}
+@keyframes bstar{to{transform:scale(1.15) rotate(14deg)}}
+.buddy[data-emo=love] .b-eye{background:#ff5d8f;width:16px;height:16px;top:3px;border-radius:0;clip-path:path('M8 15 L1.6 8.4 A3.9 3.9 0 0 1 8 3.4 A3.9 3.9 0 0 1 14.4 8.4 Z');animation:bbeat .5s ease-in-out infinite}
+.buddy[data-emo=love] .b-leds{filter:drop-shadow(0 0 3px #ff5d8f)}
+@keyframes bbeat{50%{transform:scale(1.2)}}
+.buddy[data-emo=laugh] .b-eye{background:transparent;width:10px;height:10px;top:7px;border-radius:2px;border:3px solid #2a1712}
+.buddy[data-emo=laugh] .b-eye.l{border-left:0;border-bottom:0;transform:rotate(45deg);left:7px}
+.buddy[data-emo=laugh] .b-eye.r{border-right:0;border-top:0;transform:rotate(45deg);right:7px}
+.buddy[data-emo=laugh] .b-rig{animation:bshake .14s ease-in-out 10 alternate}
+@keyframes bshake{from{rotate:-4deg}to{rotate:4deg}}
+.buddy[data-emo=think] .b-eye.r{transform:scaleY(.45)}
+.buddy[data-emo=listen] .b-eye{width:15px;height:18px;top:3px}
+.buddy[data-emo=listen] .b-ear::after{animation:pulse 1s ease-in-out infinite}
+.buddy[data-emo=sad] .b-eye{height:13px;top:8px;border-radius:50% 50% 45% 45%/35% 35% 65% 65%}
+.buddy[data-emo=sad] .b-eye.l{rotate:-14deg}.buddy[data-emo=sad] .b-eye.r{rotate:14deg}
+.buddy[data-emo=sad] .b-tear{display:block;animation:btear 1.4s ease-in infinite}
+.buddy[data-emo=sad] .b-rig{animation:none;translate:0 3px}
+@keyframes btear{0%{opacity:0;transform:translateY(0) scale(.6)}20%{opacity:1;transform:scale(1)}100%{opacity:0;transform:translateY(16px)}}
+.buddy[data-emo=excited] .m-smile,.buddy[data-emo=love] .m-smile,.buddy[data-emo=laugh] .m-smile,.buddy[data-emo=listen] .m-smile,.buddy[data-emo=sad] .m-smile,.buddy[data-emo=think] .m-smile{display:none}
+.buddy[data-emo=excited] .m-open,.buddy[data-emo=excited] .m-tongue,.buddy[data-emo=love] .m-open,.buddy[data-emo=love] .m-tongue,.buddy[data-emo=laugh] .m-open,.buddy[data-emo=laugh] .m-tongue{display:block}
+.buddy[data-emo=excited] .b-mouth,.buddy[data-emo=love] .b-mouth,.buddy[data-emo=laugh] .b-mouth{transform:scale(1.5,1.45)}
+.buddy[data-emo=listen] .m-o{display:block}.buddy[data-emo=sad] .m-frown{display:block}.buddy[data-emo=think] .m-hmm{display:block}
+.buddy[data-emo=love] .b-cheek,.buddy[data-emo=excited] .b-cheek,.buddy[data-emo=laugh] .b-cheek{opacity:1;scale:1.25}
+/* real-3D Testy (three.js) sits over the CSS version and replaces it once loaded */
+.b-gl{position:absolute;left:-30px;top:-40px;width:156px;height:184px;max-width:none;pointer-events:none}
+.buddy.g3d .b-rig{visibility:hidden}.buddy.g3d::after{display:none}
+.buddy{transition:translate .5s cubic-bezier(.3,1.3,.5,1),rotate .5s}
+.buddy.tucked{translate:64px 0;rotate:-16deg}.buddy.tucked:hover{translate:48px 0;rotate:-8deg}
+@media (max-width:600px){.buddy.tucked{translate:40px 0}.buddy.tucked:hover{translate:30px 0}}
+/* sleeping (CSS fallback) */
+.buddy.sleep .b-eye{transform:scaleY(.1)}
+/* spawn: Testy drops in on first scroll */
+.buddy.unspawned{opacity:0;translate:0 -70px;pointer-events:none}
+.buddy{transition:translate .6s cubic-bezier(.3,1.5,.5,1),rotate .5s,opacity .3s}
+/* hover bubble */
+.b-say{position:absolute;right:92px;top:2px;white-space:nowrap;font-size:.72rem;color:var(--text);background:var(--card);border:1px solid var(--red);border-radius:12px 12px 2px 12px;padding:6px 10px;box-shadow:0 8px 20px rgba(0,0,0,.3);opacity:0;transform:translateY(6px) scale(.9);transform-origin:100% 100%;transition:.25s;pointer-events:none}
+.buddy.say .b-say{opacity:1;transform:none}
+.buddy.chat .b-say{opacity:0}
+/* Ask Testy chat panel */
+.tchat{position:fixed;right:140px;bottom:92px;z-index:202;width:min(350px,calc(100vw - 168px));max-height:min(520px,calc(100vh - 130px));display:flex;flex-direction:column;
+ background:var(--card);border:1px solid color-mix(in srgb,var(--red) 45%,var(--line));border-radius:16px 16px 4px 16px;box-shadow:0 24px 60px rgba(0,0,0,.45);overflow:hidden;
+ opacity:0;transform:translateY(10px) scale(.96);transform-origin:100% 100%;pointer-events:none;visibility:hidden;transition:opacity .22s,transform .22s,visibility 0s .22s}
+.tchat.open{opacity:1;transform:none;pointer-events:auto;visibility:visible;transition:opacity .22s,transform .22s}
+.tc-h{display:flex;align-items:center;gap:10px;padding:12px 12px 12px 14px;border-bottom:1px solid var(--line);background:linear-gradient(135deg,color-mix(in srgb,var(--red) 12%,transparent),color-mix(in srgb,var(--red2) 8%,transparent) 70%)}
+.tc-av{flex:none;width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 35% 28%,#e9eef7 0 8%,#22d3ee 45%,#0e7490);position:relative}
+.tc-av::after{content:"";position:absolute;left:6px;right:6px;top:9px;height:10px;border-radius:5px;background:#170d13;box-shadow:inset 3px 0 0 -1px #a5f3fc}
+.tc-t{flex:1;min-width:0;line-height:1.2}
+.tc-t b{display:block;font-size:.9rem}
+.tc-t span{font-size:.7rem;color:var(--muted);font-family:var(--mono)}
+.tc-t span i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--pass);margin-right:5px;vertical-align:1px;box-shadow:0 0 6px var(--pass)}
+.tc-b{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;font-size:.85rem}
+.tc-b:hover{color:var(--text);border-color:var(--text)}
+.tc-log{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;overscroll-behavior:contain}
+.tc-m{max-width:88%;font-size:.84rem;line-height:1.5;padding:9px 12px;border-radius:14px;animation:mIn .25s cubic-bezier(.2,.8,.2,1)}
+.tc-m.tbot{align-self:flex-start;background:color-mix(in srgb,var(--text) 6%,transparent);border:1px solid var(--line);border-bottom-left-radius:4px}
+.tc-m.tme{align-self:flex-end;background:var(--cta);color:var(--cta-ink);border-bottom-right-radius:4px}
+.tc-m a,.tc-m button.lk{color:var(--red);text-decoration:underline;text-underline-offset:2px;background:none;border:0;font:inherit;cursor:pointer;padding:0}
+.tc-m ul{margin:6px 0 0 16px}.tc-m li{margin:2px 0}
+.tc-m.tdots{display:flex;gap:4px;padding:12px 14px}
+.tc-m.tdots i{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:blink 1s infinite}
+.tc-m.tdots i:nth-child(2){animation-delay:.15s}.tc-m.tdots i:nth-child(3){animation-delay:.3s}
+.tc-q{display:flex;gap:6px;overflow-x:auto;padding:0 14px 10px;scrollbar-width:none;-webkit-mask:linear-gradient(90deg,#000 85%,transparent);mask:linear-gradient(90deg,#000 85%,transparent)}
+.tc-q::-webkit-scrollbar{display:none}
+.tc-q button{flex:none;font:500 .72rem var(--mono);color:var(--text);background:transparent;border:1px solid var(--line);border-radius:99px;padding:6px 10px;cursor:pointer;white-space:nowrap;transition:.2s}
+.tc-q button:hover{border-color:var(--red);background:color-mix(in srgb,var(--red) 12%,transparent)}
+.tc-f{display:flex;gap:8px;padding:10px 12px 12px;border-top:1px solid var(--line)}
+.tc-f input{flex:1;min-width:0;font:inherit;font-size:.85rem;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px;outline:none}
+.tc-f input:focus{border-color:var(--red)}
+.tc-f button{flex:none;width:38px;border-radius:10px;border:0;background:var(--cta);color:var(--cta-ink);font-size:1rem;cursor:pointer}
+.tc-f .tc-mic{background:transparent;border:1px solid var(--line);font-size:.95rem}
+.tc-f .tc-mic:hover{border-color:var(--red)}
+.tc-f .tc-mic.on{background:#ef4444;border-color:#ef4444;animation:bmic 1.1s ease-out infinite}
+.tc-f .tc-mic[hidden]{display:none}
+@keyframes bmic{from{box-shadow:0 0 0 0 rgba(239,68,68,.55)}to{box-shadow:0 0 0 10px rgba(239,68,68,0)}}
+@media (max-width:900px){.buddy{right:12px;bottom:76px;scale:.8}.tchat{right:12px;left:12px;width:auto;bottom:190px;max-height:calc(100vh - 260px)}}
+@media (max-width:600px){.buddy{right:4px;bottom:66px;scale:.62}.tchat{bottom:160px;max-height:calc(100vh - 220px)}}
 </style>
 </head>
 <body>
@@ -710,6 +934,31 @@ nav .navsoc{display:none}
 </nav>
 
 <a href="Sudipta_Mohanty_Resume.pdf" download="Sudipta_Mohanty_Resume.pdf" class="fab" aria-label="Download CV"><span class="fab-ic">⤓</span><span class="fab-tx">Download CV</span></a>
+<div class="buddy" id="buddy" role="button" tabindex="0" aria-label="Ask Testy, the site mascot, about Sudipta" aria-expanded="false" aria-controls="tchat">
+  <div class="b-rig">
+    <div class="b-body"><i class="b-arm l"></i><i class="b-arm r"></i><i class="b-lan"></i><span class="b-id"><i></i><b>TESTY<em>QA BOT</em></b><u></u></span></div>
+    <div class="b-head">
+      <div class="b-ball"></div>
+      <div class="b-turn">
+        <i class="b-ear l"></i><i class="b-ear r"></i>
+        <div class="b-ant"><i></i></div>
+        <i class="b-cheek l"></i><i class="b-cheek r"></i>
+        <div class="b-face"><div class="b-leds"><i class="b-eye l"></i><i class="b-eye r"></i>
+          <svg class="b-mouth" viewBox="0 0 24 14" aria-hidden="true"><path class="m-smile" d="M4 4 Q8 9.5 12 5 Q16 9.5 20 4"/><path class="m-open" d="M4 3 Q12 17 20 3 Z"/><path class="m-tongue" d="M8.5 9.6 Q12 7.4 15.5 9.6 Q12 13 8.5 9.6 Z"/><path class="m-o" d="M12 3.6 a3.4 4 0 1 0 .01 0"/><path class="m-frown" d="M6.5 10 Q12 4.5 17.5 10"/><path class="m-hmm" d="M8 7.5 Q12 5.5 16.5 7"/></svg></div><i class="b-tear"></i></div>
+      </div>
+    </div>
+  </div>
+  <span class="b-say mono" aria-hidden="true"></span>
+</div>
+<div class="tchat" id="tchat" role="dialog" aria-label="Ask Testy about Sudipta">
+  <div class="tc-h"><span class="tc-av" aria-hidden="true"></span><span class="tc-t"><b>Ask Testy</b><span><i></i>Sudipta's QA assistant</span></span>
+    <button type="button" class="tc-b" id="tcHide" aria-label="Hide Testy" title="Hide Testy">🙈</button>
+    <button type="button" class="tc-b" id="tcVoice" aria-label="Mute Testy's voice" title="Voice on / off">🔊</button>
+    <button type="button" class="tc-b" id="tcX" aria-label="Close chat">✕</button></div>
+  <div class="tc-log" id="tcLog" role="log" aria-live="polite"></div>
+  <div class="tc-q" id="tcQ" aria-label="Suggested questions"></div>
+  <form class="tc-f" id="tcF" autocomplete="off"><input id="tcIn" maxlength="200" placeholder="Ask about Sudipta's work…" aria-label="Your question for Testy"><button type="button" class="tc-mic" id="tcMic" aria-label="Ask by voice" title="Ask by voice">🎤</button><button type="submit" aria-label="Send question">➤</button></form>
+</div>
 <div class="cur-glow"></div><div class="cur-ring"></div><div class="cur-dot"></div>
 
 <nav>
@@ -766,7 +1015,7 @@ nav .navsoc{display:none}
     </div>
     <a class="ci" href="https://github.com/hermiones/sudipta-portfolio/actions/workflows/tests.yml" target="_blank" rel="noopener">
       <img src="https://github.com/hermiones/sudipta-portfolio/actions/workflows/tests.yml/badge.svg" alt="Portfolio tests: live CI status" height="20" loading="lazy">
-      <span>This site is tested: <b>21 Playwright checks</b> on Chrome, Firefox &amp; Safari, run on every deploy</span>
+      <span>This site is tested: <b>36 Playwright checks</b> on Chrome, Firefox &amp; Safari, run on every deploy</span>
     </a>
   </div>
   <figure class="portrait">
@@ -1010,6 +1259,30 @@ sdet · scrum master <span class="cursor"></span></pre>
       <div class="cell" data-c="qa"><div class="top"><span class="id">#SYS-09</span><span>QA CRAFT</span></div><h4>Process</h4><div class="chips"><span class="chip">Agile/Scrum</span><span class="chip">TDD</span><span class="chip">Shift-left</span><span class="chip">STLC</span><span class="chip">HLD/LLD</span></div></div>
     </div>
 
+    <div class="pyr-wrap" id="pyramid">
+      <div class="pyr-scene" tabindex="0" role="img" aria-label="3D test pyramid: API and service tests at the base, data and integration above, UI end-to-end above that, and exploratory testing with AI triage at the top. Drag or use the arrow keys to rotate.">
+        <div class="pyr" aria-hidden="true">
+          <div class="pyr-floor"></div>
+          <div class="slab" data-l="0" data-n="API · SERVICE" style="--i:0;--w:250px;--h:54px;--y:81px;--c:var(--pass)"></div>
+          <div class="slab" data-l="1" data-n="DATA · INTEGRATION" style="--i:1;--w:190px;--h:54px;--y:27px;--c:var(--red)"></div>
+          <div class="slab" data-l="2" data-n="UI · E2E" style="--i:2;--w:130px;--h:54px;--y:-27px;--c:var(--red2)"></div>
+          <div class="slab" data-l="3" data-n="EXPLORE" style="--i:3;--w:70px;--h:46px;--y:-77px;--c:var(--warn)"></div>
+        </div>
+        <span class="pyr-hint mono" aria-hidden="true">⟲ drag to rotate · hover to explode</span>
+      </div>
+      <div class="pyr-copy">
+        <span class="pyr-k mono">// HOW I LAYER A SUITE</span>
+        <h3>The test pyramid, in 3D</h3>
+        <p>Many fast, cheap checks at the bottom. Fewer slow, high-value ones at the top. Each layer runs before the next one is allowed to.</p>
+        <ol class="pyr-leg mono">
+          <li data-l="3" tabindex="0" style="--i:3;--c:var(--warn)"><i></i><span><b>Exploratory + AI triage</b><em>Risk-based · Claude agents</em></span><span class="ok">✓ pass</span></li>
+          <li data-l="2" tabindex="0" style="--i:2;--c:var(--red2)"><i></i><span><b>UI end-to-end</b><em>Playwright · Selenium · Appium</em></span><span class="ok">✓ pass</span></li>
+          <li data-l="1" tabindex="0" style="--i:1;--c:var(--red)"><i></i><span><b>Data &amp; integration</b><em>SQL Server · Kafka · RabbitMQ</em></span><span class="ok">✓ pass</span></li>
+          <li data-l="0" tabindex="0" style="--i:0;--c:var(--pass)"><i></i><span><b>API &amp; service</b><em>Pytest · Requests · Postman</em></span><span class="ok">✓ pass</span></li>
+        </ol>
+      </div>
+    </div>
+
     <div class="edu" style="margin-top:56px">
       <div class="box reveal">
         <h4>// EDUCATION</h4>
@@ -1108,7 +1381,7 @@ sdet · scrum master <span class="cursor"></span></pre>
 <div id="nudge" class="nudge" hidden><span>Before you go, here's my <b>profile at a glance</b>.</span><button type="button" class="btn" data-hire data-nudge-close>Show me</button><button type="button" class="m-x" data-nudge-close aria-label="Dismiss">✕</button></div>
 <script defer src="/_vercel/insights/script.js"></script>
 
-<footer><div class="wrap"><span>© <span id="yr"></span> Sudipta Mohanty · <a href="#" id="rebuild">↻ rebuild site</a> · <span id="bugPill">🐞 5 bugs are hidden on this page. Find them all</span> <button type="button" class="bug" data-bug="5" aria-label="Hidden bug 5 of 5">🐞</button></span><span><a href="https://github.com/hermiones" target="_blank" rel="noopener">GitHub</a> · <a href="https://www.linkedin.com/in/sudiptamohanty" target="_blank" rel="noopener">LinkedIn</a> · Built with test coverage in mind ✓</span></div></footer>
+<footer><div class="wrap"><span>© <span id="yr"></span> Sudipta Mohanty · <a href="#" id="rebuild">↻ rebuild site</a> · <a href="#" id="inspectLink">🔍 inspect this page</a> ·<span id="bugPill">🐞 5 bugs are hidden on this page. Find them all</span> <button type="button" class="bug" data-bug="5" aria-label="Hidden bug 5 of 5">🐞</button></span><span><a href="https://github.com/hermiones" target="_blank" rel="noopener">GitHub</a> · <a href="https://www.linkedin.com/in/sudiptamohanty" target="_blank" rel="noopener">LinkedIn</a> · Built with test coverage in mind ✓</span></div></footer>
 
 <script>
 document.getElementById('yr').textContent=new Date().getFullYear();
@@ -1541,7 +1814,14 @@ function tcol(c){return isLight()?(LIGHT_MAP[c]||c):c}
 // ===== light / dark theme toggle =====
 (()=>{const b=document.getElementById('themeBtn'),root=document.documentElement;
  const sync=()=>{const l=root.dataset.theme==='light';b.textContent=l?'☾':'☀';b.setAttribute('aria-label',l?'Switch to dark theme':'Switch to light theme')};sync();
- b.addEventListener('click',()=>{if(root.dataset.theme==='light')delete root.dataset.theme;else root.dataset.theme='light';try{localStorage.setItem('theme',root.dataset.theme||'dark')}catch(e){}sync()})})();
+ const flip=()=>{if(root.dataset.theme==='light')delete root.dataset.theme;else root.dataset.theme='light';try{localStorage.setItem('theme',root.dataset.theme||'dark')}catch(e){}sync()};
+ // circular reveal spreading from the toggle (View Transitions API; plain swap where unsupported)
+ b.addEventListener('click',()=>{if(!document.startViewTransition||reduce){flip();return}
+  const r=b.getBoundingClientRect(),x=r.width?r.left+r.width/2:innerWidth/2,y=r.height?r.top+r.height/2:innerHeight/2,
+   R=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y));
+  const vt=document.startViewTransition(flip);
+  vt.ready.then(()=>root.animate({clipPath:[`circle(0px at ${x}px ${y}px)`,`circle(${R}px at ${x}px ${y}px)`]},
+   {duration:700,easing:'cubic-bezier(.65,0,.35,1)',pseudoElement:'::view-transition-new(root)'})).catch(()=>{})})})();
 
 
 // ===== toast =====
@@ -1564,6 +1844,9 @@ document.querySelectorAll('dialog').forEach(d=>{d.addEventListener('click',e=>{i
   ['Download CV','pdf',()=>document.querySelector('a[download][href$=".pdf"]').click()],
   ['LinkedIn','link',open('https://www.linkedin.com/in/sudiptamohanty')],['GitHub','link',open('https://github.com/hermiones')],
   ['Toggle light / dark theme','theme',()=>document.getElementById('themeBtn').click()],
+  ['Ask Testy a question','chat',()=>window.testy&&window.testy.open()],
+  ['Locator inspector (press I)','tool',()=>window.inspector&&window.inspector.toggle(true)],
+  ['Test coverage of this page','tool',()=>document.querySelector('.cov-badge')?.click()],
   ['Bug hunt progress','game',()=>toast(bugMsg())],
   ['sudo hire sudipta','root',()=>{toast('[sudo] permission granted ✓ Opening profile…');setTimeout(openHire,700)},'sudo']];
  let items=[],sel=0;
@@ -1658,6 +1941,427 @@ window.celebrate=()=>{let done;try{done=sessionStorage.getItem('cheered')}catch(
  let sc;addEventListener('scroll',()=>{clearTimeout(sc);sc=setTimeout(()=>layer.classList.remove('fade'),400)},{passive:true});
 })();
 
+// ===== locator inspector: Playwright-style locators for anything you hover (press I) =====
+(()=>{const box=document.createElement('div'),tag=document.createElement('div'),bar=document.createElement('div');
+ box.className='insp-box';tag.className='insp-tag';bar.className='insp-bar mono';
+ box.setAttribute('aria-hidden','true');tag.setAttribute('aria-hidden','true');bar.setAttribute('role','status');
+ bar.innerHTML='<span>◉ <b>Locator inspector</b><span class="hint"> · hover anything · click to copy</span> · <kbd>Esc</kbd> to exit</span><button type="button" aria-label="Exit locator inspector">✕</button>';
+ document.body.append(box,tag,bar);
+ const SKIP='.insp-box,.insp-tag,.insp-bar,.cov,.cov-badge,.toast,.bots,#scrollSwarm,#buildCv';
+ let on=false,cur=null,loc=null;const cache=new WeakMap();
+ const norm=s=>(s||'').replace(/\s+/g,' ').trim();
+ const q=s=>"'"+s.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+"'";
+ const short=s=>{if(s.length<=40)return s;const c=s.slice(0,40),sp=c.lastIndexOf(' ');return sp>18?c.slice(0,sp):c};
+ const shown=el=>el.getClientRects().length>0&&getComputedStyle(el).visibility!=='hidden'&&!el.closest('[aria-hidden="true"]');
+ function roleOf(el){const r=el.getAttribute('role');if(r)return r.split(' ')[0];const t=el.tagName;
+  if(t==='A'&&el.hasAttribute('href'))return'link';if(t==='BUTTON')return'button';if(/^H[1-6]$/.test(t))return'heading';
+  if(t==='INPUT'){const ty=el.type;if(ty==='hidden')return null;if(ty==='checkbox'||ty==='radio')return ty;if(['submit','button','reset'].includes(ty))return'button';return'textbox'}
+  if(t==='TEXTAREA')return'textbox';if(t==='SELECT')return'combobox';if(t==='IMG'&&el.getAttribute('alt'))return'img';return null}
+ function labelOf(el){const l=el.labels&&el.labels[0];if(!l)return'';
+  return norm([...l.childNodes].filter(n=>!(n.matches&&n.matches('input,select,textarea'))).map(n=>n.textContent).join(' ')).replace(/\s*\*$/,'')}
+ function nameOf(el,role){const al=el.getAttribute('aria-label');if(al)return norm(al);
+  const lb=el.getAttribute('aria-labelledby');if(lb){const n=norm(lb.split(/\s+/).map(id=>document.getElementById(id)?.textContent||'').join(' '));if(n)return n}
+  if(role==='img')return norm(el.alt);if(el.labels&&el.labels.length)return labelOf(el);if(role==='textbox'||role==='combobox')return'';return norm(el.innerText||el.textContent)}
+ const INTERACTIVE=new Set(['link','button','textbox','checkbox','radio','combobox','img','heading','tab','option','switch']);
+ function pick(t){for(let el=t,k=0;el&&el!==document.body&&k<8;el=el.parentElement,k++){if(el.dataset&&el.dataset.testid)return el;if(INTERACTIVE.has(roleOf(el)))return el}
+  let el=t;while(norm(el.innerText).length<4&&el.parentElement&&el.parentElement!==document.body)el=el.parentElement;return el}
+ function count(fn,sel){let n=0;document.querySelectorAll(sel).forEach(e=>{if(!e.closest(SKIP)&&fn(e)&&shown(e))n++});return n}
+ function build(el){if(cache.has(el))return cache.get(el);let m,a,n;
+  const tid=el.dataset&&el.dataset.testid,role=roleOf(el);
+  if(tid){m='getByTestId';a=[q(tid)];n=count(e=>e.dataset.testid===tid,'[data-testid]')}
+  else if((role==='textbox'||role==='combobox')&&labelOf(el)){const s=short(labelOf(el)).toLowerCase();m='getByLabel';a=[q(short(labelOf(el)))];n=count(e=>labelOf(e).toLowerCase().includes(s),'input,select,textarea')}
+  else if(role==='textbox'&&el.placeholder){m='getByPlaceholder';a=[q(el.placeholder)];n=count(e=>e.placeholder===el.placeholder,'[placeholder]')}
+  else if(role==='img'){const s=short(norm(el.alt));m='getByAltText';a=[q(s)];n=count(e=>norm(e.alt).toLowerCase().includes(s.toLowerCase()),'img[alt]')}
+  else if(role&&nameOf(el,role)){const full=nameOf(el,role),s=short(full),sl=s.toLowerCase();m='getByRole';
+   const opt=role==='heading'&&!el.getAttribute('role')?`{ name: ${q(s)}, level: ${el.tagName[1]} }`:`{ name: ${q(s)} }`;a=[q(role),opt];
+   n=count(e=>roleOf(e)===role&&(role!=='heading'||e.tagName===el.tagName||e.getAttribute('role'))&&nameOf(e,role).toLowerCase().includes(sl),'a[href],button,h1,h2,h3,h4,h5,h6,input,select,textarea,img,[role]')}
+  else{const txt=norm(el.innerText);
+   if(txt&&txt.length<=160){const s=short(txt),sl=s.toLowerCase();m='getByText';a=[q(s)];
+    n=count(e=>norm(e.textContent).toLowerCase().includes(sl)&&![...e.children].some(c=>norm(c.textContent).toLowerCase().includes(sl)),'body *:not(script):not(style)')}
+   else{const host=el.closest('[id]'),cls=[...el.classList].filter(c=>!/^(in|on|spot|tilt|reveal|lit|hit|bot-hit|pop|pre|sharp|words|unbuilt)$/.test(c))[0];
+    let sel=(host&&host!==el?'#'+host.id+' ':'')+(el.id?'#'+el.id:el.tagName.toLowerCase()+(cls?'.'+cls:''));m='locator';a=[q(sel)];
+    try{n=document.querySelectorAll(sel).length}catch(e){n=1}}}
+  const r={m,a,n,code:`page.${m}(${a.join(', ')})`};cache.set(el,r);return r}
+ function html(r){const hl=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/('(?:[^'\\]|\\.)*')/g,'<span class="s">$1</span>').replace(/\b(name|level)(:)/g,'<span class="k">$1</span>$2');
+  const badge=r.n===1?'<span class="cnt">✓ unique</span>':`<span class="cnt warn">⚠ ${r.n||0} matches</span>`;
+  return `<span class="p">page.</span><span class="m">${r.m}</span>(${r.a.map(hl).join(', ')})${badge}`}
+ function place(){if(!cur||!cur.isConnected){box.classList.remove('on');tag.classList.remove('on');return}
+  const b=cur.getBoundingClientRect();box.style.transform=`translate(${b.left-2}px,${b.top-2}px)`;box.style.width=b.width+4+'px';box.style.height=b.height+4+'px';
+  const tw=tag.offsetWidth,th=tag.offsetHeight;let x=Math.max(8,Math.min(innerWidth-tw-8,b.left)),y=b.top-th-8;if(y<64)y=Math.min(innerHeight-th-8,b.bottom+8);
+  tag.style.transform=`translate(${x}px,${y}px)`;box.classList.add('on');tag.classList.add('on')}
+ function show(t){if(!t||t.closest(SKIP)||t===document.body||t===document.documentElement){cur=null;place();return}
+  const el=pick(t);if(el===cur)return;cur=el;loc=build(el);tag.innerHTML=html(loc);place()}
+ async function copy(s){try{await navigator.clipboard.writeText(s);return true}catch(e){
+  const ta=document.createElement('textarea');ta.value=s;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand('copy')}catch(x){}ta.remove();return ok}}
+ function toggle(v){on=v===undefined?!on:!!v;document.body.classList.toggle('inspecting',on);cur=null;place();
+  if(on)toast('🔍 Locator inspector on · hover anything to get its Playwright locator',3200)}
+ addEventListener('mousemove',e=>{if(on)show(e.target)},{passive:true});
+ addEventListener('scroll',()=>{if(on)requestAnimationFrame(place)},{passive:true});
+ addEventListener('resize',()=>{if(on)place()});
+ addEventListener('click',e=>{if(!on||e.target.closest('.insp-bar'))return;if(e.target.closest('#inspectLink')){e.preventDefault();return}
+  e.preventDefault();e.stopImmediatePropagation();show(e.target);if(!loc||!cur)return;const code=loc.code;
+  copy(code).then(ok=>toast((ok?'📋 Copied: ':'Locator: ')+code,3400))},true);
+ addEventListener('keydown',e=>{const t=e.target.tagName;
+  if(e.key==='Escape'&&on){toggle(false);return}
+  if(e.key.toLowerCase()==='i'&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&!/INPUT|TEXTAREA|SELECT/.test(t)&&!e.target.isContentEditable&&!document.querySelector('dialog[open]'))toggle()});
+ bar.querySelector('button').addEventListener('click',()=>toggle(false));
+ document.getElementById('inspectLink')?.addEventListener('click',e=>{e.preventDefault();toggle()});
+ window.inspector={toggle,locatorFor:el=>build(el).code};})();
+
+// ===== coverage gutter: which parts of the page you've actually read =====
+(()=>{const N=48,NEED=1200,TICK=250,root=document.documentElement;
+ const g=document.createElement('div');g.className='cov';g.setAttribute('aria-hidden','true');g.innerHTML='<i></i>'.repeat(N)+'<b class="cov-view"></b>';
+ const badge=document.createElement('button');badge.type='button';badge.className='cov-badge mono';
+ badge.innerHTML='<span>coverage</span><b>0%</b><span class="cov-bar"><i></i></span>';
+ document.body.append(g,badge);
+ const bands=[...g.querySelectorAll('i')],view=g.querySelector('.cov-view'),pct=badge.querySelector('b'),bar=badge.querySelector('.cov-bar i');
+ let dwell=new Array(N).fill(0),cheered=false;
+ try{const s=JSON.parse(sessionStorage.getItem('cov')||'null');if(Array.isArray(s)&&s.length===N)dwell=s.map(Number);cheered=!!sessionStorage.getItem('covDone')}catch(e){}
+ const H=()=>root.scrollHeight;
+ function covered(){return dwell.filter(d=>d>=NEED).length}
+ function paint(){dwell.forEach((d,i)=>{bands[i].className=d>=NEED?'hit':d>0?'part':''});
+  const c=covered(),p=Math.round(c/N*100);pct.textContent=p+'%';bar.style.width=p+'%';badge.classList.toggle('full',c===N);
+  badge.setAttribute('aria-label',`Page coverage ${p}%. `+(c<N?'Jump to the next part you have not read':'You have read the whole page'));
+  badge.title=c<N?`Lines covered: ${c}/${N} · click to jump to the next unread part`:'100% covered: you read the whole page';
+  if(c===N&&!cheered){cheered=true;try{sessionStorage.setItem('covDone',1)}catch(e){}toast('✅ 100% coverage: you read the whole page. More thorough than most test suites.',4200)}}
+ function paintView(){const h=H();view.style.top=(scrollY/h*100)+'%';view.style.height=(innerHeight/h*100)+'%'}
+ setInterval(()=>{if(document.hidden||root.classList.contains('prebuild')||root.classList.contains('building'))return;
+  const h=H(),vh=innerHeight,y=scrollY;let a=y+vh*.15,b=y+vh*.85;if(y<=4)a=0;if(y+vh>=h-4)b=h;a=a/h*N;b=b/h*N;let ch=false;
+  for(let i=Math.max(0,Math.floor(a));i<Math.min(N,Math.ceil(b));i++){if(Math.min(b,i+1)-Math.max(a,i)>=.5&&dwell[i]<NEED){dwell[i]+=TICK;ch=true}}
+  if(ch){paint();try{sessionStorage.setItem('cov',JSON.stringify(dwell))}catch(e){}}},TICK);
+ let tk=false;addEventListener('scroll',()=>{if(tk)return;tk=true;requestAnimationFrame(()=>{tk=false;paintView()})},{passive:true});
+ addEventListener('resize',paintView);
+ badge.addEventListener('click',()=>{const i=dwell.findIndex(d=>d<NEED);if(i<0){toast('✅ 100% coverage. Nothing left unread.');return}
+  scrollTo({top:Math.max(0,i/N*H()-innerHeight*.2),behavior:reduce?'auto':'smooth'});toast(`↧ Jumping to uncovered lines (${covered()}/${N} covered)`)});
+ paint();paintView();})();
+
+// ===== 3D test pyramid: drag to rotate, hover to explode, builds itself on first view =====
+(()=>{const wrap=document.getElementById('pyramid');if(!wrap)return;
+ const sc=wrap.querySelector('.pyr-scene'),py=wrap.querySelector('.pyr'),slabs=[...py.querySelectorAll('.slab')],items=[...wrap.querySelectorAll('.pyr-leg li')];
+ slabs.forEach(s=>{const n=s.dataset.n;s.innerHTML=['fr','rt','bk','lf'].map(f=>`<div class="f ${f}">${n}</div>`).join('')+'<div class="f tp"></div><div class="f bt"></div>'});
+ let ry=-32,rx=-22,vy=0,drag=null,vis=false,raf=0,idle=0,last=0;
+ const L=a=>(.4+.6*Math.max(0,Math.cos((a+40)*Math.PI/180))).toFixed(3);
+ function apply(){py.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`;
+  py.style.setProperty('--l0',L(ry));py.style.setProperty('--l1',L(ry+90));py.style.setProperty('--l2',L(ry+180));py.style.setProperty('--l3',L(ry-90))}
+ function tick(t){const dt=Math.min(50,t-(last||t));last=t;
+  if(!drag){if(Math.abs(vy)>.02){ry+=vy;vy*=.94}else if(!reduce&&t>idle)ry+=dt*.011}
+  apply();if(vis&&!document.hidden)raf=requestAnimationFrame(tick)}
+ function run(){cancelAnimationFrame(raf);last=0;if(vis&&!document.hidden)raf=requestAnimationFrame(tick)}
+ new IntersectionObserver(([e])=>{vis=e.isIntersecting;if(e.intersectionRatio>.35)wrap.classList.add('built');run()},{threshold:[0,.35,.6]}).observe(wrap);
+ document.addEventListener('visibilitychange',run);
+ sc.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,ry,rx,lx:e.clientX};vy=0;sc.classList.add('dragging');try{sc.setPointerCapture(e.pointerId)}catch(x){}});
+ sc.addEventListener('pointermove',e=>{if(!drag)return;ry=drag.ry+(e.clientX-drag.x)*.45;rx=Math.max(-60,Math.min(-4,drag.rx-(e.clientY-drag.y)*.3));vy=(e.clientX-drag.lx)*.45;drag.lx=e.clientX;if(reduce)apply()});
+ const end=()=>{if(!drag)return;drag=null;sc.classList.remove('dragging');idle=performance.now()+2500};
+ sc.addEventListener('pointerup',end);sc.addEventListener('pointercancel',end);
+ sc.addEventListener('keydown',e=>{const k=e.key;if(!/^Arrow/.test(k))return;e.preventDefault();
+  if(k==='ArrowLeft')ry-=15;if(k==='ArrowRight')ry+=15;if(k==='ArrowUp')rx=Math.min(-4,rx+6);if(k==='ArrowDown')rx=Math.max(-60,rx-6);idle=performance.now()+3000;apply()});
+ sc.addEventListener('pointerenter',()=>wrap.classList.add('exp'));sc.addEventListener('pointerleave',()=>{wrap.classList.remove('exp');hi(-1)});
+ function hi(l){slabs.forEach(s=>s.classList.toggle('on',+s.dataset.l===l));items.forEach(li=>li.classList.toggle('on',+li.dataset.l===l))}
+ slabs.forEach(s=>s.addEventListener('pointerenter',()=>hi(+s.dataset.l)));
+ items.forEach(li=>{const l=+li.dataset.l;
+  li.addEventListener('pointerenter',()=>{wrap.classList.add('exp');hi(l)});li.addEventListener('pointerleave',()=>{wrap.classList.remove('exp');hi(-1)});
+  li.addEventListener('focus',()=>{wrap.classList.add('exp');hi(l)});li.addEventListener('blur',()=>{wrap.classList.remove('exp');hi(-1)})});
+ addEventListener('scroll',()=>{if(vis&&!drag&&!reduce)vy=Math.min(vy+.25,3)},{passive:true});
+ apply();})();
+
+// ===== Testy: 3D mascot that follows your cursor and answers questions about Sudipta =====
+(()=>{const bd=document.getElementById('buddy'),panel=document.getElementById('tchat');if(!bd||!panel)return;
+ const turn=bd.querySelector('.b-turn'),head=bd.querySelector('.b-head'),leds=bd.querySelector('.b-leds'),idc=bd.querySelector('.b-id'),say=bd.querySelector('.b-say');
+ const log=document.getElementById('tcLog'),chips=document.getElementById('tcQ'),form=document.getElementById('tcF'),inp=document.getElementById('tcIn'),vBtn=document.getElementById('tcVoice');
+
+ // ---- head + eye tracking ----
+ let tx=0,ty=0,yaw=0,pitch=0,last=-1e9,raf=0,near=false,gaze=null,lgx=0,lgy=0,hops=0,mouthOpen=0,sgUntil=0,sgY=0,twirls=0;
+ function aim(x,y){const r=head.getBoundingClientRect(),dx=x-(r.left+r.width/2),dy=y-(r.top+r.height/2);
+  tx=Math.tanh(dx/300);ty=Math.tanh(dy/240);last=performance.now();   // responsive even to small moves
+  const n=Math.hypot(dx,dy)<200;if(n!==near){near=n;bd.classList.toggle('near',n)}wake()}
+ addEventListener('pointermove',e=>{if(e.pointerType!=='touch')aim(e.clientX,e.clientY)},{passive:true});
+ addEventListener('pointerdown',e=>aim(e.clientX,e.clientY),{passive:true});
+ function frame(t){raf=0;let gx=tx,gy=ty;
+  if(gaze){gx=gaze[0];gy=gaze[1]}else if(t<sgUntil){gx=gx*.3;gy=sgY}else if(t-last>3500&&!reduce){gx=Math.sin(t/1700)*.6;gy=Math.sin(t/2300)*.25-.1}   // emotion gaze, or idle glances
+  lgx=gx;lgy=gy;const py=pitch;yaw+=(gx*48-yaw)*.14;pitch+=(-gy*34-pitch)*.14;
+  turn.style.transform=`rotateY(${yaw.toFixed(2)}deg) rotateX(${pitch.toFixed(2)}deg)`;
+  head.style.setProperty('--tilt',(yaw*.12).toFixed(2)+'deg');
+  leds.style.setProperty('--ex',(gx*2.2).toFixed(2)+'px');leds.style.setProperty('--ey',(gy*1.6).toFixed(2)+'px');
+  idc.style.setProperty('--swing',(-yaw*.35+(pitch-py)*3).toFixed(2)+'deg');   // the ID card swings a little
+  const settled=Math.abs(gx*48-yaw)<.05&&Math.abs(-gy*34-pitch)<.05;
+  if(!document.hidden&&!(reduce&&settled))raf=requestAnimationFrame(frame)}
+ function wake(){if(!raf&&!document.hidden)raf=requestAnimationFrame(frame)}
+ document.addEventListener('visibilitychange',wake);wake();
+ (function blink(){if(!reduce&&!document.hidden){bd.classList.add('blink');setTimeout(()=>bd.classList.remove('blink'),140)}setTimeout(blink,2400+Math.random()*2800)})();
+ let st;function bubble(msg,ms=2600){say.textContent=msg;bd.classList.add('say','happy');clearTimeout(st);st=setTimeout(()=>bd.classList.remove('say','happy'),ms)}
+ function hop(){hops++;bd.classList.remove('hop');void bd.offsetWidth;bd.classList.add('hop')}
+
+ // ---- emotions: face, body and little particles ----
+ const mouth=bd.querySelector('.b-mouth');let emoT;
+ function fx(ch,n,col){if(reduce)return;for(let i=0;i<n;i++){const s=document.createElement('span');s.className='b-fx';s.textContent=ch;s.style.color=col;
+  s.style.setProperty('--x',(Math.random()*76-38).toFixed(0)+'px');s.style.animationDelay=(i*120)+'ms';bd.appendChild(s);setTimeout(()=>s.remove(),1500+i*120)}}
+ function setEmo(e,ms){clearTimeout(emoT);if(e)bd.dataset.emo=e;else bd.removeAttribute('data-emo');
+  gaze=e==='think'?[.55,-.9]:e==='sad'?[-.1,.95]:null;wake();
+  if(e==='excited'){hop();setTimeout(hop,620);fx('✦',5,'#ffcf4a')}else if(e==='love'){hop();fx('♥',4,'#ff5d8f')}else if(e==='laugh')fx('✧',3,'#a5f3fc');else if(e==='happy'||e==='wink')hop();
+  if(ms)emoT=setTimeout(()=>setEmo(''),ms)}
+
+ // ---- cute babble voice: sung syllables that follow each answer's rhythm and vowels (Web Audio, no robotic TTS) ----
+ let soundOn=true;try{soundOn=localStorage.getItem('testyVoice')!=='off'}catch(e){}
+ const syncV=()=>{vBtn.textContent=soundOn?'🔊':'🔇';vBtn.setAttribute('aria-label',soundOn?"Mute Testy's voice":"Unmute Testy's voice")};syncV();
+ const AC=window.AudioContext||window.webkitAudioContext;let ac,master;
+ function actx(){if(!AC||!soundOn)return null;try{if(!ac){ac=new AC();master=ac.createGain();master.gain.value=.6;const cmp=ac.createDynamicsCompressor();master.connect(cmp).connect(ac.destination)}
+  if(ac.state==='suspended')ac.resume();return ac}catch(e){return null}}
+ const FORM={a:[850,1250],e:[480,2150],i:[310,2550],o:[520,900],u:[360,820],y:[310,2550]};
+ const MOOD={happy:{f:560,v:.1,d:.07,c:.05},excited:{f:640,v:.13,d:.058,c:.22},love:{f:580,v:.09,d:.08,c:.08},laugh:{f:620,v:.12,d:.06,c:0},
+  think:{f:480,v:.06,d:.09,c:0},listen:{f:580,v:.1,d:.07,c:.2},sad:{f:440,v:.07,d:.1,c:-.24},wink:{f:580,v:.11,d:.068,c:.06}};
+ function syl(t,f0,dur,vow,glide){const c=ac,o=c.createOscillator(),s=c.createOscillator(),g=c.createGain(),gs=c.createGain(),g2=c.createGain(),b1=c.createBiquadFilter(),b2=c.createBiquadFilter(),lp=c.createBiquadFilter();
+  const[F1,F2]=FORM[vow]||FORM.a;o.type='sawtooth';s.type='sine';
+  for(const x of[o,s]){x.frequency.setValueAtTime(f0,t);x.frequency.exponentialRampToValueAtTime(Math.max(60,f0*glide),t+dur)}
+  b1.type=b2.type='bandpass';b1.frequency.value=F1;b1.Q.value=4;b2.frequency.value=F2;b2.Q.value=7;g2.gain.value=.6;gs.gain.value=.22;lp.type='lowpass';lp.frequency.value=3400;
+  o.connect(b1).connect(g);o.connect(b2).connect(g2).connect(g);s.connect(gs).connect(g);g.connect(lp).connect(master);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.55,t+.012);g.gain.setValueAtTime(.55,t+dur*.55);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.start(t);s.start(t);o.stop(t+dur+.02);s.stop(t+dur+.02)}
+ function chime(t,fs){fs.forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=f;const s=t+i*.075;
+  g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(.12,s+.01);g.gain.exponentialRampToValueAtTime(.0001,s+.3);o.connect(g).connect(master);o.start(s);o.stop(s+.32)})}
+ function plan(text,mood){const M=MOOD[mood]||MOOD.happy,out=[];
+  const toks=text.replace(/[\p{Extended_Pictographic}\uFE0F]/gu,'').match(/[A-Za-z0-9']+|[.,!?;:]/g)||[];
+  for(const w of toks){if(/^[.,!?;:]$/.test(w)){const l=out[out.length-1];if(!l)continue;l.gap+=/[,;:]/.test(w)?.12:.24;
+    if(w==='?'){l.f*=1.22;l.glide=1.2}else if(w==='!'){l.f*=1.12;l.glide=1.08}else if(w==='.')l.glide=.85;continue}
+   const vs=(w.toLowerCase().match(/[aeiouy]+/g)||['a']).slice(0,3);
+   vs.forEach((v,j)=>{const h=(w.charCodeAt(j%w.length)*7+j*13+w.length)%9;out.push({v:v[0],f:M.f*(1+(h-4)*M.v*.25),d:M.d*(.85+(h%3)*.12),gap:.026,glide:.96})})}
+  const L=out.slice(0,44);L.forEach((x,i)=>{x.f*=1+M.c*(i/Math.max(1,L.length-1)-.3)});
+  if(mood==='sad')L.unshift({v:'a',f:M.f*1.15,d:.34,gap:.12,glide:.74});         // "awww…"
+  if(mood==='excited')L.unshift({v:'o',f:M.f*.95,d:.2,gap:.07,glide:1.32});      // "ooh!"
+  if(mood==='love')L.unshift({v:'a',f:M.f*1.05,d:.26,gap:.08,glide:.88});        // "aww"
+  if(mood==='laugh')[1.62,1.52,1.44,1.36,1.3].forEach((k,i)=>L.push({v:'e',f:M.f*k,d:.05,gap:i?.03:.14,glide:.9}));   // "hehehe"
+  return L}
+ let talkTimers=[],curSrc=null,anaRaf=0,speakTok=0;
+ function hush(){talkTimers.forEach(clearTimeout);talkTimers=[];if(curSrc){try{curSrc.onended=null;curSrc.stop()}catch(e){}curSrc=null}
+  cancelAnimationFrame(anaRaf);mouth.style.scale='';mouthOpen=0;bd.classList.remove('talking')}
+ function babbleSpeak(text,mood){const L=plan(text,mood),c=actx(),t0=c?c.currentTime+.06:0;
+  let t=0;if(c&&mood==='excited'){chime(t0,[1568,2093,2637]);t=.16}else if(c&&mood==='love'){chime(t0,[1319,1760]);t=.12}
+  L.forEach(x=>{if(c)syl(t0+t,x.f,x.d,x.v,x.glide);
+   talkTimers.push(setTimeout(()=>{mouthOpen=.55+Math.random()*.45;mouth.style.scale=`1.12 ${(1+mouthOpen).toFixed(2)}`},t*1000),setTimeout(()=>{mouthOpen=0;mouth.style.scale=''},(t+x.d)*1000));t+=x.d+x.gap});
+  bd.classList.add('talking');return new Promise(res=>talkTimers.push(setTimeout(()=>{hush();res()},t*1000+60)))}
+ // ---- recorded voice: clips generated once with ElevenLabs (tools/testy-voice.mjs), lip-synced to their loudness ----
+ let clipMap=null;const clipBufs=new Map();
+ function manifest(){return clipMap||(clipMap=fetch('audio/testy/manifest.json',{cache:'no-cache'}).then(r=>r.ok?r.json():{}).then(j=>j.clips||{}).catch(()=>({})))}
+ function clipBuf(id){const c=actx();if(!c||!id)return Promise.resolve(null);
+  return manifest().then(m=>{if(!m[id])return null;
+   if(!clipBufs.has(id))clipBufs.set(id,fetch('audio/testy/'+m[id]).then(r=>r.ok?r.arrayBuffer():Promise.reject()).then(b=>new Promise((ok,no)=>c.decodeAudioData(b,ok,no))).catch(()=>null));
+   return clipBufs.get(id)})}
+ function playBuf(buf){const c=ac,src=c.createBufferSource(),an=c.createAnalyser(),g=c.createGain();src.buffer=buf;an.fftSize=512;g.gain.value=1.5;
+  src.connect(an);an.connect(g).connect(master);curSrc=src;bd.classList.add('talking');const data=new Uint8Array(an.fftSize);
+  (function lip(){an.getByteTimeDomainData(data);let s=0;for(let i=0;i<data.length;i++){const x=(data[i]-128)/128;s+=x*x}
+   mouthOpen=Math.min(1,Math.sqrt(s/data.length)*5.5);mouth.style.scale=mouthOpen>.08?`1.12 ${(1+mouthOpen).toFixed(2)}`:'';anaRaf=requestAnimationFrame(lip)})();
+  src.start();return new Promise(res=>{src.onended=()=>{if(curSrc===src){curSrc=null;cancelAnimationFrame(anaRaf);mouthOpen=0;mouth.style.scale='';bd.classList.remove('talking')}res()}})}
+ // speak a line: the recorded clip if there is one, otherwise the babble voice. Resolves when Testy stops talking.
+ function speak(text,mood='happy',id){const tok=++speakTok;hush();if(!soundOn)return new Promise(r=>setTimeout(r,900));
+  return clipBuf(id).then(buf=>{if(tok!==speakTok)return;return buf?playBuf(buf):quiet(mood)})}
+ // no recorded clip: just a soft mood chime (the old babble was unintelligible)
+ function quiet(mood){const c=actx();if(c){const t=c.currentTime+.02;chime(t,mood==='sad'?[784,659]:mood==='love'?[1319,1760]:mood==='excited'?[1568,2093,2637]:[1175,1568])}return new Promise(r=>setTimeout(r,900))}
+ let emoGen=0;
+ function feel(mood,text,id,hold=1300){const n=++emoGen;setEmo(mood);return speak(text,mood,id).then(()=>{if(n===emoGen)emoT=setTimeout(()=>setEmo(''),hold)})}
+ function hum(){const c=actx();if(!c)return;const t=c.currentTime+.03;syl(t,460,.22,'u',1.06);syl(t+.26,500,.3,'u',.95)}   // "hmm?"
+ vBtn.addEventListener('click',()=>{soundOn=!soundOn;try{localStorage.setItem('testyVoice',soundOn?'on':'off')}catch(e){}syncV();
+  if(soundOn)feel('excited','Yay! I can talk again!','unmute');else hush()});
+
+ // ---- talk to Testy: speech recognition (Chrome, Edge, Safari) ----
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition,mic=document.getElementById('tcMic');let rec=null,listening=false;
+ if(!SR)mic.hidden=true;
+ else mic.addEventListener('click',()=>{if(listening){try{rec.stop()}catch(e){}return}
+  rec=new SR();rec.lang=/^en/i.test(navigator.language||'')?navigator.language:'en-US';rec.interimResults=true;rec.maxAlternatives=1;let final='',failed=false;
+  rec.onstart=()=>{hush();listening=true;mic.classList.add('on');mic.setAttribute('aria-label','Stop listening');inp.value='';inp.placeholder='Listening… ask me out loud 🎧';setEmo('listen');const c=actx();if(c)chime(c.currentTime+.02,[988,1319])};
+  rec.onresult=e=>{let s='';for(const r of e.results)s+=r[0].transcript;inp.value=s;if(e.results[e.results.length-1].isFinal)final=s};
+  rec.onerror=e=>{failed=true;const perm=/not-allowed|service-not-allowed/.test(e.error);
+   const msg=perm?"I need microphone permission to hear you 🎤 You can type instead!":e.error==='no-speech'?"I didn't catch that. Tap 🎤 and try again!":"My ears glitched 🙈 Try typing instead!";
+   add(msg,'tbot');feel('sad',msg,perm?'micperm':e.error==='no-speech'?'nospeech':'micerr')};
+  rec.onend=()=>{listening=false;mic.classList.remove('on');mic.setAttribute('aria-label','Ask by voice');inp.placeholder="Ask about Sudipta's work…";
+   if(bd.dataset.emo==='listen')setEmo('');const q=(final||inp.value).trim();inp.value='';if(q&&!failed)ask(q)};
+  try{rec.start()}catch(e){}});
+
+ 
+// ---- what Testy knows: only facts that are on this site ----
+ const A=(t,id)=>`<button type="button" class="lk" data-act="${id}">${t}</button>`;
+ const KB=[
+  {q:'Who is Sudipta?',k:['who','about','sudipta','introduce','summary','tell','herself','himself','themselves','profile','overview','background'],
+   s:"Sudipta Mohanty is an SDET with over five years in test automation, CI CD pipelines and AI-assisted QA.",
+   a:`<b>Sudipta Mohanty</b> is an SDET with <b>5+ years</b> (5 years 2 months) in test automation, CI/CD and AI-assisted QA. Sudipta builds Playwright, Selenium and Pytest frameworks, designs Azure DevOps and AWS pipelines, and owns the quality gate for an external automation team. ${A('Profile at a glance →','hire')}`},
+  {q:'How much experience?',k:['experience','years','long','exp','career','history','worked','companies','company','job','jobs','capgemini','iskraemeco','employer','senior'],
+   s:"Five years and two months. Since July 2023 Sudipta has been an SDET at Iskraemeco India, and before that a Senior Analyst at Capgemini in Bengaluru.",
+   a:`<b>5 years 2 months</b> in QA:<ul><li><b>SDET</b>, Iskraemeco India · Jul 2023 – present · Kolkata</li><li><b>Senior Analyst, SDET &amp; Test Automation</b>, Capgemini · Sep 2021 – Jul 2023 · Bengaluru</li></ul>${A('See the experience section →','#experience')}`},
+  {q:'Biggest wins?',k:['achievement','achievements','wins','impact','results','proud','best','highlights','metrics','numbers','accomplish','success'],
+   s:"Cutting regression time in half, forty percent fewer escaped defects, sixty to eighty percent faster deploys, and leading a team of four.",
+   a:`Some highlights:<ul><li><b>−50% regression time</b> across 500+ automated cases</li><li><b>−40% escaped defects</b> with Claude multi-agent QA</li><li><b>60–80% faster deploys</b> across 10+ microservices</li><li>Led a team of 4 · 8 releases in a row with no UAT bug leakage</li><li>🏆 Top Performer, Sogeti Q1 Rockstar (Capgemini, 2022)</li></ul>${A('Read the case study →','/case-study.html')}`},
+  {q:'Tech stack?',k:['stack','tech','tools','skills','skill','technologies','playwright','selenium','pytest','python','language','framework','frameworks','know','appium','postman','aws','azure','docker','kafka','sql','ci','cd','cicd','devops','pipeline','pipelines'],
+   s:"Playwright, Selenium and Pytest for automation, Azure DevOps, GitHub Actions and AWS for CI CD, plus Claude multi-agent workflows for AI-assisted QA.",
+   a:`<ul><li><b>Automation:</b> Playwright, Selenium, Pytest, xdist, Grid, POM, Appium, Postman, Requests, Allure</li><li><b>CI/CD &amp; cloud:</b> Azure DevOps YAML, GitHub Actions, AWS CodePipeline, Docker, EC2, S3, CloudFront</li><li><b>Data:</b> SQL Server, Kafka (KRaft), RabbitMQ, Grafana</li><li><b>AI:</b> Claude, Cursor, multi-agent fan-out/fan-in, RAG with FAISS</li></ul>${A('See the skills matrix →','#matrix')}`},
+  {q:'How is AI used in QA?',k:['ai','claude','agent','agents','agentic','llm','genai','rag','faiss','multi','swarm','gpt','cursor','automation'],
+   s:"Sudipta runs Claude fan-out fan-in agents for test generation, defect triage and reporting, and built a local RAG for cited spec lookups.",
+   a:`Sudipta uses <b>Claude multi-agent workflows</b>: one orchestrator fans a release out to specialist agents for test generation, defect triage and reporting, then fans the results back in. That cut sprint defect escape by 40%. There's also a local <b>RAG</b> (FAISS + sentence-transformers + Claude) for cited spec lookups. ${A('Watch the swarm demo →','#swarm')}`},
+  {q:'Notice period?',k:['notice','join','joining','start','available','availability','when','immediately','period'],
+   s:"The notice period is thirty days.",
+   a:`The notice period is <b>30 days</b>. ${A('Send a message →','#contact')}`},
+  {q:'Where are you based?',k:['where','location','based','city','relocate','relocation','kolkata','bengaluru','bangalore','hyderabad','pune','mumbai','delhi','move','live'],
+   s:"Sudipta is based in Kolkata and open to relocating anywhere in India, especially Bengaluru, Hyderabad, Delhi NCR, Mumbai or Pune.",
+   a:`📍 Based in <b>Kolkata</b>, open to relocating <b>pan-India</b>.<br>Preferred: Bengaluru · Hyderabad · Delhi NCR · Mumbai · Pune.`},
+  {q:'Open to which roles?',k:['role','roles','position','looking','open','hire','hiring','job','title','lead','opportunity','seeking','want'],
+   s:"Sudipta is open to SDET, QA Lead and AI QA roles.",
+   a:`Open to <b>SDET · QA Lead · AI-QA</b> roles. ${A('Download the CV →','cv')}`},
+  {q:'Show me projects',k:['project','projects','built','build','portfolio','github','repo','repos','code','work','demo','framework'],
+   s:"The flagship is an agentic QA framework with Playwright, session replay and automated failure triage. There's a public demo on GitHub.",
+   a:`<ul><li><b>Agentic QA Framework</b>: cross-browser Playwright + Pytest, CAPTCHA session replay, automated failure triage, local RAG</li><li><b>RF meter integration testing</b>: HES/NMS failover across 4 production clusters</li><li>On GitHub: agentic-qa-framework, JobPilot, bugblast and more</li></ul>${A('See the projects →','#flagships')} · ${A('GitHub ↗','gh')}`},
+  {q:'Certifications?',k:['certification','certifications','certified','certificate','csm','scrum','course','award','awards','badge'],
+   s:"Claude 101 from Anthropic, Certified ScrumMaster, Selenium 101, and a Top Performer award at Capgemini.",
+   a:`<ul><li>Claude 101 · Anthropic · 2026</li><li>Certified ScrumMaster® · Scrum Alliance · 2025</li><li>Selenium 101 · LambdaTest · 2024</li><li>QE&amp;T Engineer L1 &amp; L2 · Capgemini · 2022</li><li>🏆 Sogeti Q1 Rockstar · Top Performer · 2022</li></ul>`},
+  {q:'Education?',k:['education','degree','study','studied','college','university','mca','bca','srm','cgpa','qualification'],
+   s:"An MCA from SRM University with a CGPA of 8.9, and a BCA from Techno India.",
+   a:`<ul><li><b>MCA</b>, SRM University KTR · 2020–22 · CGPA 8.9</li><li><b>BCA</b>, Techno India Main · 2017–20</li></ul>`},
+  {q:'How do I contact?',k:['contact','email','mail','reach','call','phone','linkedin','message','talk','connect','cv','resume','download','interview'],
+   s:"The easiest way is the contact form, or LinkedIn. You can grab the CV too!",
+   a:`${A('✉ Contact form','#contact')} · ${A('LinkedIn ↗','li')} · ${A('⤓ Download CV','cv')}`},
+  {q:'Tell me a QA joke',k:['joke','funny','fun','laugh','humor','humour'],
+   s:"A QA engineer walks into a bar. Orders one beer. Orders zero beers. Orders minus one beers. Orders a lizard. The first real customer asks where the bathroom is, and the bar catches fire.",
+   a:`A QA engineer walks into a bar. Orders 1 beer. Orders 0 beers. Orders −1 beers. Orders a lizard. 🦎<br>The first real customer asks where the bathroom is, and the bar bursts into flames. 🔥`},
+  {q:'Why hire Sudipta?',k:['why','strength','strengths','strong','fit','choose','unique','special','qualities','stand','hire'],
+   s:"End to end ownership, real measurable results, and practical A I powered QA!",
+   a:`Three reasons:<ul><li><b>End-to-end ownership:</b> frameworks, CI/CD pipelines and the quality gate, built from scratch across 3 product lines</li><li><b>Measurable results:</b> −50% regression time, −40% escaped defects, 60–80% faster deploys</li><li><b>Practical AI-assisted QA:</b> Claude multi-agent workflows already in production use</li></ul>${A('Profile at a glance →','hire')}`},
+  {q:'Team leadership?',k:['leader','leadership','manage','managed','management','mentor','mentoring','team','teams','led','people'],
+   s:"Yes! Sudipta led a team of four, and owns the quality gate for an external automation team!",
+   a:`<b>Yes.</b> Sudipta led a team of 4: planned sprints, reviewed test code and PRs, and owned delivery and release quality end to end. Sudipta also owns the automation quality gate (coding standards, PR conventions, test strategy, review checklist) for an external team, and is a Certified ScrumMaster®.`},
+  {id:'salary',e:'happy',k:['salary','ctc','compensation','pay','package','expected','expectation','expectations','lpa','money'],s:"Ooh, that's a grown up question! Best to ask Sudipta directly!",a:`That's best discussed with Sudipta directly. ${A('Send a message →','#contact')}`},
+  {id:'remote',e:'happy',re:/\b(remote|hybrid|wfh|work from home|onsite)\b/,k:['remote','hybrid','wfh','onsite','office'],s:"Sudipta is in Kolkata and happy to relocate anywhere in India! For remote or hybrid, just ask!",a:`Sudipta is based in Kolkata and open to relocating pan-India. For remote or hybrid setups, ${A('ask Sudipta directly →','#contact')}`},
+  {id:'gm',e:'happy',re:/\bgood\s*morning\b|\bgm\b|^morning\b/,k:['morning','gm'],s:"Good morning! Ask me anything about Sudipta's work!",a:`Good morning! ☀️ Ask me anything about Sudipta's work, or tap a question below.`},
+  {id:'ga',e:'happy',re:/\bgood\s*afternoon\b/,k:['afternoon'],s:"Good afternoon! Ask me anything!",a:`Good afternoon! 🌤️ Ask me anything about Sudipta's work, or tap a question below.`},
+  {id:'ge',e:'happy',re:/\bgood\s*evening\b/,k:['evening'],s:"Good evening! Ask me anything!",a:`Good evening! 🌆 Ask me anything about Sudipta's work, or tap a question below.`},
+  {id:'gn',e:'love',re:/\bgood\s*night\b|\bgn\b|\bnight night\b|\bsweet dreams\b/,k:['night','goodnight','gn'],s:"Good night! Sweet dreams!",a:`Good night! 🌙 Sweet dreams. Sudipta's CV will be right here when you're back. ${A('⤓ Download CV','cv')}`},
+  {k:['hi','hello','hey','hii','yo','namaste','sup'],s:"Hey! Ask me anything about Sudipta's work.",a:`Hey! 👋 Ask me anything about Sudipta's work, or tap a question below.`},
+  {re:/\b(who|what) are you\b|\byour name\b|\btesty\b|\bare you (a )?(bot|robot|real)\b/,k:['testy','bot','robot','mascot'],s:"I'm Testy, Sudipta's little QA bot. I check every page before you see it!",a:`I'm <b>Testy</b> 🤖, Sudipta's little QA bot. I check this page before you see it, and I'm wearing my office ID, so it's official.`},
+  {k:['thanks','thank','thx','ty','great','cool','nice','awesome','love'],s:"Aww, anytime!",a:`Aww, anytime! 💛 Anything else you'd like to know?`}];
+ const STOP=new Set(['you','your','are','name','the','a','an','is','of','to','do','does','what','and','in','on','for','me','with','can','i','her','his','their','they','she','he','sudipta','s','have','has','any','tell']);
+ // ---- typo-tolerant matching: edit distance + a sound-alike "skeleton" (playwrite/plawrite → playwright) ----
+ function lev(a,b){const m=a.length,n=b.length;if(!m||!n)return m||n;let p=Array.from({length:n+1},(_,j)=>j);
+  for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[n]}
+ const skel=w=>w[0]+w.slice(1).replace(/ght/g,'t').replace(/ph/g,'f').replace(/ck/g,'k').replace(/[aeiouywh]/g,'').replace(/(.)\1+/g,'$1');
+ function fuzzy(t,k){if(t===k)return true;if(k.length<5||t.length<4||t[0]!==k[0])return false;
+  if(lev(t,k)<=Math.floor(k.length/5)+(k.length>=8?1:0))return true;const a=skel(t);return a.length>=3&&a===skel(k)}
+ const words=q=>q.toLowerCase().replace(/[^a-z0-9#+]+/g,' ').trim().split(' ').filter(Boolean);
+ function hits(ws,aliases){const line=' '+ws.join(' ')+' ';return aliases.some(al=>al.includes(' ')?line.includes(' '+al+' '):ws.some(w=>fuzzy(w,al)))}
+ // ---- skills Testy can vouch for, with evidence that's on this site ----
+ const SK=[
+  {id:'sk-playwright',n:'Playwright',al:['playwright','playwrite','playright'],a:`<b>Yes!</b> Playwright is Sudipta's main UI framework: a cross-browser <b>Playwright + Pytest</b> framework for the Anantya HES web client (Dec 2025 – present) on Chrome, Edge, Firefox and WebKit, with POM, auto-waiting locators, CAPTCHA session replay and automated failure triage. This portfolio is tested with Playwright too. ${A('See the project →','#flagships')}`,s:"Yes! Playwright is Sudipta's main UI testing framework!"},
+  {id:'sk-selenium',n:'Selenium',al:['selenium','webdriver','selenium grid'],a:`<b>Yes.</b> Sudipta built a <b>Selenium + Pytest</b> framework (POM, data-driven tests, Selenium Grid parallel cross-browser runs, Allure reports) that cut regression time by 50% across 500+ cases, and holds the Selenium 101 certification. ${A('Read the case study →','/case-study.html')}`,s:"Yes! Sudipta built a Selenium framework that cut regression time in half!"},
+  {id:'sk-python',n:'Python / Pytest',al:['pytest','python','xdist','fixtures'],a:`<b>Yes.</b> Sudipta's frameworks are Python-based: <b>Pytest</b> with xdist for parallel runs, fixtures, POM and data-driven tests, plus Requests for API checks. Sudipta also holds a Python Automation and Testing certificate.`,s:"Yes! Sudipta's test frameworks are all Python and Pytest!"},
+  {id:'sk-api',n:'API testing',al:['api','apis','rest','restful','postman','requests','backend'],a:`<b>Yes.</b> At Capgemini Sudipta ran <b>200+ REST API tests</b> across 5+ backend services, cutting P1/P2 defects by 35%, with Postman, Python Requests and Pytest. There's also a public API-TEST-FRAMEWORK repo. ${A('GitHub ↗','gh')}`,s:"Yes! Over two hundred REST API tests across five backend services!"},
+  {id:'sk-mobile',n:'Mobile / Appium',al:['appium','mobile','android'],a:`Appium is in Sudipta's toolkit for mobile automation, and Sudipta built the Azure DevOps pipelines for the React and Android apps (60–80% faster deploys).`,s:"Yes! Appium for mobile, and pipelines for the Android apps too!"},
+  {id:'sk-cicd',n:'CI/CD (Azure DevOps)',al:['azure','devops','azure devops','yaml','ci','cd','cicd','pipeline','pipelines','deployment','deployments','deploys'],a:`<b>Yes.</b> Sudipta designed <b>Azure DevOps YAML pipelines</b> for 10+ .NET microservices and React/Android apps, improving deployment efficiency by 60–80%, and built AWS CodePipeline CI/CD for zero-downtime deploys.`,s:"Yes! Sudipta's pipelines made deploys up to eighty percent faster!"},
+  {id:'sk-aws',n:'AWS',al:['aws','amazon','codepipeline','codebuild','ec2','s3','cloudfront','route53','vpc','cloud'],a:`<b>Yes.</b> Sudipta built AWS CI/CD with <b>CodePipeline + CodeBuild</b> on EC2, S3, Route 53, CloudFront, ALB and VPC peering for zero-downtime deploys.`,s:"Yes! Sudipta built A W S pipelines with zero downtime deploys!"},
+  {id:'sk-gha',n:'GitHub Actions',al:['github actions','gha'],a:`<b>Yes.</b> GitHub Actions is in Sudipta's pipeline toolkit. This site's own Playwright suite runs on GitHub Actions across Chrome, Firefox and Safari on every deploy.`,s:"Yes! This very website gets tested by GitHub Actions!"},
+  {id:'sk-docker',n:'Docker',al:['docker','container','containers'],a:`Docker is part of Sudipta's CI/CD toolkit, and Sudipta holds the Docker Foundations Professional Certificate.`,s:"Yes! Docker, with a certificate and everything!"},
+  {id:'sk-jenkins',n:'Jenkins',al:['jenkins'],a:`Sudipta has a Jenkins certification (Coursera, "Automating your delivery pipeline", 2022). Day-to-day pipeline work has been on Azure DevOps, GitHub Actions and AWS CodePipeline.`,s:"Sudipta has a Jenkins certificate, and mostly uses Azure DevOps day to day!"},
+  {id:'sk-messaging',n:'Kafka / RabbitMQ',al:['kafka','rabbitmq','rabbit','kraft','messaging','queue','queues'],a:`<b>Yes.</b> Sudipta validated <b>Kafka (KRaft)</b> and <b>RabbitMQ</b> on Linux VMs and wrote the HLD/LLD docs the team adopted.`,s:"Yes! Kafka and RabbitMQ, and Sudipta wrote the design docs too!"},
+  {id:'sk-sql',n:'SQL',al:['sql','database','databases','db','mssql','sql server','query','queries'],a:`<b>Yes.</b> Sudipta uses <b>SQL Server</b> for data validation, including DLMS/COSEM checks with Gurux, and holds HackerRank's SQL (Advanced) certification.`,s:"Yes! SQL Server, with an advanced SQL certificate!"},
+  {id:'sk-monitoring',n:'Grafana / Prometheus',al:['grafana','prometheus','influxdb','influx','monitoring','observability'],a:`Grafana, Prometheus and InfluxDB are in Sudipta's toolkit, used on the RF meter integration and scale-testing work.`,s:"Yes! Grafana and Prometheus for watching the systems!"},
+  {id:'sk-jira',n:'JIRA / Confluence',al:['jira','confluence','atlassian','bug tracking'],a:`<b>Yes.</b> At Capgemini Sudipta owned the full <b>JIRA/Confluence</b> bug lifecycle, cutting defect resolution time by 25%.`,s:"Yes! Sudipta owned the whole Jira bug lifecycle!"},
+  {id:'sk-agile',n:'Agile / Scrum',al:['scrum','agile','scrummaster','sprint','sprints','csm'],a:`Sudipta is a <b>Certified ScrumMaster®</b> (Scrum Alliance, 2025–2027) and has planned sprints while leading a team of 4.`,s:"Yes! Sudipta is a Certified ScrumMaster!"},
+  {id:'sk-crossbrowser',n:'Cross-browser testing',al:['lambdatest','crossbrowser','cross browser','browsers','webkit','firefox','safari'],a:`<b>Yes.</b> Sudipta runs cross-browser suites on Chrome, Edge, Firefox and WebKit, and holds LambdaTest's Selenium 101 certification.`,s:"Yes! Chrome, Edge, Firefox and WebKit, all of them!"},
+  {id:'sk-load',n:'Load / performance testing',al:['load','performance','scale','stress','scalability'],a:`Sudipta did scale and load testing on the RF meter communication project (HES/NMS across 4 production clusters in a high-availability setup).`,s:"Yes! Scale and load testing across four production clusters!"},
+  {id:'sk-manual',n:'Manual & regression testing',al:['manual','functional','sanity','uat','exploratory','regression testing','smoke'],a:`<b>Yes.</b> Sudipta started with manual, functional and API testing at Capgemini, and led regression and sanity phases across 8 releases in a row with no UAT bug leakage.`,s:"Yes! Eight releases in a row with zero U A T bug leakage!"},
+  {id:'sk-design',n:'Test design',al:['bva','boundary','equivalence','decision table','decision tables','rca','root cause','risk based','test design','test plan','test strategy','test cases'],a:`Sudipta designs tests with equivalence partitioning, boundary values, decision tables and risk-based testing, has designed 320+ test cases, and owns test strategy for an external automation team.`,s:"Yes! Boundary values, decision tables, risk based testing, the works!"},
+  {id:'sk-domain',n:'Smart metering / IoT',al:['iot','smart meter','meters','meter','utilities','utility','dlms','cosem','rf','mesh','hes','mdm','nms','gurux','wirepas','energy'],a:`Sudipta's domain is smart metering for utilities: RF mesh (Wirepas), HES/NMS/MDM integration and DLMS/COSEM checks with Gurux, across 4 production clusters for government utilities.`,s:"Yes! Smart meters, RF mesh networks, and big utility systems!"},
+  {id:'sk-pom',n:'Framework design (POM)',al:['pom','page object','page objects','framework design','data driven','ddt'],a:`Sudipta builds frameworks around the <b>Page Object Model</b> with data-driven tests, in both Selenium and Playwright, and built one from scratch at Capgemini.`,s:"Yes! Page objects and data driven tests, built from scratch!"},
+  {id:'sk-linux',n:'Linux',al:['linux','vm','vms'],a:`Sudipta validated Kafka and RabbitMQ setups on Linux VMs.`,s:"Yes! Kafka and RabbitMQ on Linux machines!"},
+  {id:'sk-js',n:'JavaScript',al:['javascript','js','typescript','ts','node','nodejs'],a:`Sudipta's frameworks are Python-based, but this portfolio's own Playwright test suite is written in JavaScript.`,s:"Sudipta mostly uses Python, but this website's tests are in JavaScript!"}];
+ // tools that are NOT on this site: answer honestly and point to the closest real experience
+ const NOT={cypress:['Cypress','Playwright'],java:['Java','Python + Pytest'],testng:['TestNG','Pytest'],junit:['JUnit','Pytest'],cucumber:['Cucumber','Pytest'],bdd:['BDD','Pytest'],
+  jmeter:['JMeter','load testing on the RF meter project'],k6:['k6','load testing on the RF meter project'],locust:['Locust','load testing on the RF meter project'],
+  kubernetes:['Kubernetes','Docker and AWS'],k8s:['Kubernetes','Docker and AWS'],terraform:['Terraform','AWS CI/CD'],gcp:['GCP','AWS'],gitlab:['GitLab CI','Azure DevOps and GitHub Actions'],
+  browserstack:['BrowserStack','LambdaTest'],webdriverio:['WebdriverIO','Playwright and Selenium'],puppeteer:['Puppeteer','Playwright'],katalon:['Katalon','Playwright and Selenium'],
+  tosca:['Tosca','Playwright and Selenium'],uft:['UFT','Playwright and Selenium'],ios:['iOS','Appium and Android'],xcuitest:['XCUITest','Appium'],espresso:['Espresso','Appium'],
+  'c#':['C#','Python'],csharp:['C#','Python'],golang:['Go','Python'],ruby:['Ruby','Python'],php:['PHP','Python'],react:['React development','pipelines for React apps']};
+ function skillAnswer(q){const ws=words(q),known=SK.filter(s=>hits(ws,s.al));
+  const unknown=[...new Set(ws.filter(w=>NOT[w]))];
+  if(!known.length&&!unknown.length)return null;
+  const notes=unknown.map(k=>`I don't see <b>${NOT[k][0]}</b> on Sudipta's site. The closest experience is ${NOT[k][1]}.`);
+  if(known.length===1&&!unknown.length)return{id:known[0].id,e:'excited',s:known[0].s,a:known[0].a};
+  if(!known.length)return{id:'nolist',e:'think',s:"Hmm, I don't see that on Sudipta's site. Best to ask Sudipta directly!",
+   a:notes.join('<br>')+` For anything not listed, ${A('ask Sudipta directly →','#contact')}`};
+  return{id:'multi',e:'excited',s:"Yes! Sudipta has worked with those! Here are the details!",
+   a:'<ul>'+known.slice(0,4).map(s=>`<li><b>${s.n}:</b> ${s.a.replace(/^<b>Yes[.!]<\/b>\s*/,'')}</li>`).join('')+'</ul>'+(notes.length?'<p style="margin-top:6px">'+notes.join('<br>')+'</p>':'')}}
+ function answer(text){const sk=skillAnswer(text);if(sk)return sk;
+  const ws=words(text);let best=null,score=0;
+  KB.forEach(e=>{let sc=0;ws.forEach(x=>{if(e.k.includes(x))sc+=STOP.has(x)?.3:1;else if(x.length>=4&&e.k.some(k=>k.length>=5&&fuzzy(x,k)))sc+=.8});
+   if(e.q&&e.q.toLowerCase()===text.toLowerCase())sc+=5;if(e.re&&e.re.test(text.toLowerCase()))sc+=3;if(sc>score){score=sc;best=e}});
+  if(best&&score>=.6)return best;
+  return{id:'unknown',e:'sad',s:"Hmm, I only know about Sudipta's work. Try one of these questions!",a:`Hmm, I only know about Sudipta's work, so I don't have an answer for that one. 🥺 Try a question below, or ${A('ask Sudipta directly →','#contact')}`}}
+ const EMO={'Who is Sudipta?':'happy','How much experience?':'excited','Biggest wins?':'excited','Tech stack?':'happy','How is AI used in QA?':'excited','Notice period?':'happy',
+  'Where are you based?':'happy','Open to which roles?':'happy','Show me projects':'excited','Certifications?':'excited','Education?':'happy','How do I contact?':'love','Tell me a QA joke':'laugh','Why hire Sudipta?':'excited','Team leadership?':'excited'};
+ const IDS={'Who is Sudipta?':'who','How much experience?':'exp','Biggest wins?':'wins','Tech stack?':'stack','How is AI used in QA?':'ai','Notice period?':'notice','Where are you based?':'where',
+  'Open to which roles?':'roles','Show me projects':'projects','Certifications?':'certs','Education?':'edu','How do I contact?':'contact','Tell me a QA joke':'joke','Why hire Sudipta?':'why','Team leadership?':'lead'};
+ KB.forEach(e=>{e.id=e.id||(e.q?IDS[e.q]:e.k[0]==='testy'?'testy':e.k[0]==='thanks'?'thanks':'hi');e.e=e.e||(e.q?EMO[e.q]:e.k[0]==='testy'?'wink':e.k[0]==='thanks'?'love':'happy')});
+
+ // ---- chat UI ----
+ function add(html,who){const m=document.createElement('div');m.className='tc-m '+who;if(who==='tme')m.textContent=html;else m.innerHTML=html;log.appendChild(m);log.scrollTop=log.scrollHeight;return m}
+ let busy=false;
+ function ask(q){if(busy||!q.trim())return;busy=true;add(q.trim(),'tme');const e=answer(q.trim());const d=add('<i></i><i></i><i></i>','tbot tdots');setEmo('think');hum();
+  clipBuf(e.id);   // start loading the voice clip while Testy "thinks"
+  setTimeout(()=>{d.remove();add(e.a,'tbot');feel(e.e,e.s,e.id,1500);busy=false},750+Math.random()*350)}
+ KB.filter(e=>e.q).forEach(e=>{const b=document.createElement('button');b.type='button';b.textContent=e.q;b.addEventListener('click',()=>ask(e.q));chips.appendChild(b)});
+ form.addEventListener('submit',e=>{e.preventDefault();const v=inp.value;inp.value='';ask(v)});
+ log.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
+  if(a==='cv')document.querySelector('a[download][href$=".pdf"]').click();else if(a==='hire'){close();openHire()}
+  else if(a==='li')window.open('https://www.linkedin.com/in/sudiptamohanty','_blank','noopener');else if(a==='gh')window.open('https://github.com/hermiones','_blank','noopener');
+  else if(a.startsWith('#')){close();document.querySelector(a)?.scrollIntoView({behavior:reduce?'auto':'smooth'})}else location.href=a});
+ let greeted=false;
+ function open(){if(panel.classList.contains('open'))return;panel.classList.add('open');bd.classList.add('chat','happy');bd.setAttribute('aria-expanded','true');
+  if(!greeted){greeted=true;const g="Hey!";
+   add(`Hey! 👋 Ask me anything about Sudipta's work, tap a question below${SR?', or tap 🎤 and just ask out loud':''}.`,'tbot');
+   feel('excited',g,'greet',1200)}else feel('happy','Yay, you are back!','back',900);
+  if(fine)setTimeout(()=>inp.focus(),250)}
+ function close(){panel.classList.remove('open');bd.classList.remove('chat','happy');bd.setAttribute('aria-expanded','false');hush();setEmo('');if(listening)try{rec.abort()}catch(e){}}
+ // tuck Testy away (remembered) for visitors who'd rather not have a mascot
+ let tucked=false;try{tucked=localStorage.getItem('testyTucked')==='1'}catch(e){}
+ function tuck(v){tucked=v;bd.classList.toggle('tucked',v);bd.setAttribute('aria-label',v?'Bring Testy back':'Ask Testy, the site mascot, about Sudipta');try{localStorage.setItem('testyTucked',v?'1':'0')}catch(e){}}
+ if(tucked)tuck(true);
+ document.getElementById('tcHide').addEventListener('click',()=>{close();tuck(true);toast('🙈 Testy is hiding at the edge. Click to bring Testy back.')});
+ const toggle=()=>{if(tucked){tuck(false);setEmo('love',1600);hop();return}panel.classList.contains('open')?close():open()};
+ bd.addEventListener('click',toggle);
+ bd.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}});
+ document.getElementById('tcX').addEventListener('click',()=>{close();bd.focus()});
+ addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('open'))close()});
+ bd.addEventListener('pointerenter',()=>{bd.classList.add('happy');if(!panel.classList.contains('open'))bubble(tucked?'bring me back? 🥺':'ask me about Sudipta! 💬',1800)});
+ bd.addEventListener('pointerleave',()=>{if(!panel.classList.contains('open')&&!bd.classList.contains('say'))bd.classList.remove('happy')});
+ // one gentle hello per visit, after the build intro
+ // (the first hello now happens when Testy spawns on first scroll)
+ 
+// ---- scroll life: spawn on first scroll, jog while scrolling fast, react once to each section ----
+ let runUntil=0,lastY=scrollY,spawned=false;
+ bd.classList.add('unspawned');
+ function spawn(){if(spawned)return;spawned=true;bd.classList.remove('unspawned');if(tucked)return;
+  setEmo('excited',1600);let hi;try{hi=sessionStorage.getItem('testyHi')}catch(e){}
+  if(!hi){try{sessionStorage.setItem('testyHi',1)}catch(e){}setTimeout(()=>bubble('hey! 👋',2600),700)}}
+ let lastTwirl=0,endDone=false;
+ addEventListener('scroll',()=>{const dy=scrollY-lastY,d=Math.abs(dy);lastY=scrollY;if(scrollY>160)spawn();const now=performance.now();
+  if(reduce)return;if(d>40)runUntil=now+450;
+  if(d>2){sgY=dy>0?.75:-.75;sgUntil=now+500;wake()}                                   // glance the way you scroll
+  if(d>160&&now-lastTwirl>4000&&spawned&&!tucked){lastTwirl=now;twirls++}              // fast fling: twirl
+  if(!endDone&&spawned&&!tucked&&innerHeight+scrollY>=document.documentElement.scrollHeight-40){endDone=true;setEmo('laugh',2600);bubble('you read it all! 🎉',2800)}},{passive:true});
+ // doze off after 25 s of no activity; wake with a startle
+ let lastAct=performance.now(),zzz=0;
+ function poke(){lastAct=performance.now();if(bd.classList.contains('sleep')){bd.classList.remove('sleep');clearInterval(zzz);setEmo('listen',900);hop();bubble("huh? I'm awake! 👀",1600)}}
+ ['pointermove','pointerdown','keydown','scroll','touchstart'].forEach(ev=>addEventListener(ev,poke,{passive:true}));
+ setInterval(()=>{if(!spawned||tucked||reduce||document.hidden||panel.classList.contains('open')||bd.classList.contains('sleep')||bd.dataset.emo)return;
+  if(performance.now()-lastAct>25000){bd.classList.add('sleep');fx('z',1,'#a5f3fc');zzz=setInterval(()=>fx('z',1,'#a5f3fc'),1400)}},1000);
+ setTimeout(spawn,9000);   // visitors who don't scroll still meet Testy
+ const SECT={about:['love','meet Sudipta 💛'],growth:['excited','level up! ⬆️'],code:['wink','real code, no NDA 😉'],experience:['wink','5+ yrs of QA 💪'],flagships:['excited','ooh, my favourite part 👀'],swarm:['love','my agent cousins live here 🤖'],
+  matrix:['happy','ask me about any skill!'],writing:['happy','Sudipta writes too ✍️'],contact:['love','say hi to Sudipta 👋']};
+ let seen={};try{seen=JSON.parse(sessionStorage.getItem('testySeen')||'{}')}catch(e){}
+ const sio2=new IntersectionObserver(es=>es.forEach(e=>{const id=e.target.id;if(!e.isIntersecting||seen[id]||!spawned||tucked||panel.classList.contains('open')||bd.dataset.emo)return;
+  seen[id]=1;try{sessionStorage.setItem('testySeen',JSON.stringify(seen))}catch(x){}const[m,msg]=SECT[id];setEmo(m,2000);bubble(msg,2600)}),{threshold:.35});
+ Object.keys(SECT).forEach(id=>{const el=document.getElementById(id);if(el)sio2.observe(el)});
+ (function load3d(){let ok=false;try{const c=document.createElement('canvas');ok=!!(c.getContext('webgl2')||c.getContext('webgl'))}catch(e){}
+  if(!ok||navigator.connection?.saveData)return;
+  const go=()=>import('./testy3d.js').then(m=>m.mount(bd,window.testy)).then(ok=>{if(ok)bd.classList.add('g3d')}).catch(()=>{});
+  const idle=window.requestIdleCallback||(f=>setTimeout(f,1200));
+  // wait for the page load AND the build intro to finish, so the 3D never competes with the first impression
+  const root=document.documentElement,ready=()=>document.readyState==='complete'&&!root.classList.contains('prebuild')&&!root.classList.contains('building');
+  (function wait(){ready()?idle(go,{timeout:3000}):setTimeout(wait,500)})()})();
+ window.testy={open,close,ask,emo:setEmo,answer,state:()=>({sleep:bd.classList.contains('sleep'),twirls,running:performance.now()<runUntil,yaw,pitch,gx:lgx,gy:lgy,emo:bd.dataset.emo||'',mouth:mouthOpen,hops,blink:bd.classList.contains('blink'),happy:bd.classList.contains('happy'),near,talking:bd.classList.contains('talking'),reduce})};})();
 </script>
 </body>
 </html>

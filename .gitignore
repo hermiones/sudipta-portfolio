@@ -6,3 +6,4 @@ tests/playwright-report/
 index.backup.html
 index.v*-backup.html
 index.v*-*.html
+tools/voice-previews/
