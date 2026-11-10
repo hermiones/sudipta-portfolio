@@ -6,7 +6,7 @@
   "nospeech": "[curious] Hmm? I didn't catch that. Tap the mic and try again!",
   "micerr": "[sad] Oopsie, my ears glitched. Try typing instead?",
   "who": "[happy] Sudipta Mohanty is an S D E T, with over five years in test automation, C I, C D, and A I powered Q A! Pretty cool, huh?",
-  "exp": "[excited] Five years and two months! Sudipta is an S D E T at Iskraemeco India, and was a Senior Analyst at Capgemini before that!",
+  "exp": "[excited] Five years and two months! Sudipta is an S D E T at Gridcrest Technologies, formerly Iskraemeco India, and was a Senior Analyst at Capgemini before that!",
   "wins": "[excited] Ooh, so many! Regression time cut in half, forty percent fewer escaped bugs, and deploys up to eighty percent faster! [giggles] Wowww!",
   "stack": "[happy] Playwright, Selenium and Pytest for automation, Azure DevOps and A W S for pipelines, and Claude agents for A I powered testing!",
   "ai": "[excited] Sudipta uses a whole team of Claude agents! One boss agent splits the work, the helpers test at the same time, and they all report back. Like me, but more of us! [giggles]",
@@ -54,5 +54,6 @@
   "gm": "[happy] Good morning! Ask me anything about Sudipta's work!",
   "ga": "[happy] Good afternoon! Ask me anything!",
   "ge": "[happy] Good evening! Ask me anything!",
-  "gn": "[happy] Good night! Sweet dreams!"
+  "gn": "[happy] Good night! Sweet dreams!",
+  "latest": "[excited] Sudipta is an S D E T at Gridcrest Technologies, formerly Iskraemeco India, since July twenty twenty three! Leading test automation, pipelines, and A I powered Q A!"
 }

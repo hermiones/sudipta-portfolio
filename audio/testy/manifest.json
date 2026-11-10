@@ -55,7 +55,8 @@
     "gm": "gm.mp3",
     "ga": "ga.mp3",
     "ge": "ge.mp3",
-    "gn": "gn.mp3"
+    "gn": "gn.mp3",
+    "latest": "latest.mp3"
   },
   "voice": "kokoro:af_sky@1.3"
 }

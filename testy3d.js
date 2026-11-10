@@ -15,22 +15,24 @@ function radialTexture(stops, size = 128) {
 }
 
 function idCardTexture() {
-  const W = 320, H = 256, c = document.createElement('canvas'); c.width = W; c.height = H;
-  const g = c.getContext('2d');
-  const rr = (x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
-  g.fillStyle = '#f8fafc'; rr(0, 0, W, H, 22); g.fill();
-  const grd = g.createLinearGradient(0, 0, W, 0); grd.addColorStop(0, '#22d3ee'); grd.addColorStop(1, '#a78bfa');
-  g.fillStyle = grd; rr(0, 0, W, 58, 22); g.fill(); g.fillRect(0, 30, W, 28);
-  g.fillStyle = '#fff'; g.font = '700 26px ui-monospace,Menlo,monospace'; g.fillText('QA DEPT', 22, 40);
-  g.fillStyle = '#e2e8f0'; rr(22, 78, 92, 112, 12); g.fill();
-  g.fillStyle = '#f59e7a'; g.beginPath(); g.arc(68, 122, 26, 0, Math.PI * 2); g.fill();
-  g.beginPath(); g.ellipse(68, 188, 38, 30, 0, Math.PI, 0); g.fill();
-  g.fillStyle = '#1c0f0c'; g.beginPath(); g.ellipse(58, 122, 4.5, 6, 0, 0, 7); g.ellipse(78, 122, 4.5, 6, 0, 0, 7); g.fill();
-  g.fillStyle = '#0f172a'; g.font = '800 44px ui-sans-serif,system-ui,sans-serif'; g.fillText('TESTY', 130, 118);
-  g.fillStyle = '#0E7490'; g.font = '700 25px ui-monospace,Menlo,monospace'; g.fillText('QA BOT', 132, 152);
-  g.fillStyle = '#64748b'; g.font = '600 19px ui-monospace,Menlo,monospace'; g.fillText('ID 0042 ✓', 132, 182);
-  g.fillStyle = '#0f172a'; let x = 22; while (x < W - 22) { const w = [3, 5, 2, 6, 3][x % 5]; g.fillRect(x, 210, w, 26); x += w + 4; }
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
+  // a bold, high-contrast badge (drawn at 2x so it stays crisp at small sizes)
+  const W = 640, H = 500, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d'), rr = (x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
+  g.fillStyle = '#0b1222'; rr(0, 0, W, H, 44); g.fill();                       // dark frame
+  g.fillStyle = '#ffffff'; rr(14, 14, W - 28, H - 28, 34); g.fill();
+  const grd = g.createLinearGradient(0, 0, W, 0); grd.addColorStop(0, '#06b6d4'); grd.addColorStop(1, '#7c3aed');
+  g.save(); rr(14, 14, W - 28, 120, 34); g.clip(); g.fillStyle = grd; g.fillRect(14, 14, W - 28, 120); g.restore();
+  g.fillStyle = '#ffffff'; g.font = '800 54px ui-monospace,Menlo,monospace'; g.fillText('QA DEPT', 48, 96);
+  g.beginPath(); g.arc(W - 70, 74, 22, 0, 7); g.fillStyle = '#34d399'; g.fill();  // "active" light
+  g.fillStyle = '#ffe4dc'; rr(44, 166, 190, 230, 24); g.fill();                  // photo
+  g.fillStyle = '#f9967a'; g.beginPath(); g.arc(139, 262, 62, 0, 7); g.fill(); g.beginPath(); g.ellipse(139, 398, 86, 64, 0, Math.PI, 0); g.fill();
+  g.fillStyle = '#1c0f0c'; g.beginPath(); g.ellipse(116, 268, 11, 15, 0, 0, 7); g.ellipse(162, 268, 11, 15, 0, 0, 7); g.fill();
+  g.fillStyle = '#fff'; g.beginPath(); g.arc(120, 262, 4.5, 0, 7); g.arc(166, 262, 4.5, 0, 7); g.fill();
+  g.fillStyle = '#0b1222'; g.font = '900 104px ui-sans-serif,system-ui,sans-serif'; g.fillText('TESTY', 262, 262);
+  g.fillStyle = '#0e7490'; g.font = '800 48px ui-monospace,Menlo,monospace'; g.fillText('QA BOT', 266, 326);
+  g.fillStyle = '#475569'; g.font = '700 36px ui-monospace,Menlo,monospace'; g.fillText('ID 0042 ✓', 266, 378);
+  g.fillStyle = '#0b1222'; let x = 266; while (x < W - 48) { const w = [4, 8, 3, 10, 5][x % 5]; g.fillRect(x, 400, w, 54); x += w + 6; }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
 }
 
 function starShape(R, r, n = 5) {
@@ -91,7 +93,7 @@ export function mount(bd, api) {
   const pink = new THREE.MeshPhysicalMaterial({ color: 0xff4f87, roughness: 0.25, clearcoat: 1, emissive: 0x6b0f2e, emissiveIntensity: 0.4 });
   const lilac = new THREE.MeshPhysicalMaterial({ color: 0xb7a6ff, roughness: 0.3, clearcoat: 0.9, clearcoatRoughness: 0.15 });
   const led = new THREE.MeshBasicMaterial({ color: 0x8ff3ff });
-  const cyan = new THREE.MeshStandardMaterial({ color: 0x22d3ee, roughness: 0.4, emissive: 0x0b5563, emissiveIntensity: 0.5 });
+  const cyan = new THREE.MeshBasicMaterial({ color: 0x22d3ee, toneMapped: false });
   const tearMat = new THREE.MeshPhysicalMaterial({ color: 0xa5e9ff, roughness: 0.05, clearcoat: 1, transparent: true, opacity: 0.9 });
   const blushMat = new THREE.MeshBasicMaterial({ map: radialTexture([[0, 'rgba(255,120,150,.95)'], [1, 'rgba(255,120,150,0)']]), transparent: true, depthWrite: false });
 
@@ -123,14 +125,15 @@ export function mount(bd, api) {
   });
 
   // ID card on a lanyard, hinged at the neck so it can swing
-  const cardPiv = new THREE.Group(); cardPiv.position.set(0, -0.56, 0.44); bodyG.add(cardPiv);
+  const cardPiv = new THREE.Group(); cardPiv.position.set(0, -0.54, 0.44); bodyG.add(cardPiv);
   const cardTex = idCardTexture(), edge = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.4 });
-  const card = mesh(new THREE.BoxGeometry(0.56, 0.45, 0.03), [edge, edge, edge, edge,
-    new THREE.MeshPhysicalMaterial({ map: cardTex, roughness: 0.35, clearcoat: 0.8, clearcoatRoughness: 0.2 }), edge]);
-  card.position.set(0, -0.31, 0.1); card.rotation.x = -0.14; cardPiv.add(card);
+  // the printed face is unlit and not tone-mapped, so its colours stay true instead of washing out
+  const card = mesh(new THREE.BoxGeometry(0.7, 0.55, 0.035), [edge, edge, edge, edge,
+    new THREE.MeshBasicMaterial({ map: cardTex, toneMapped: false }), edge]);
+  card.position.set(0, -0.36, 0.12); card.rotation.x = -0.2; cardPiv.add(card);
   const clip = mesh(new THREE.BoxGeometry(0.12, 0.07, 0.05), new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.6, roughness: 0.3 }));
   clip.position.set(0, -0.07, 0.11); cardPiv.add(clip);
-  [-1, 1].forEach(s => cardPiv.add(tube([[s * 0.04, -0.06, 0.1], [s * 0.22, 0.12, 0.02], [s * 0.36, 0.32, -0.2]], 0.028, cyan)));
+  [-1, 1].forEach(s => cardPiv.add(tube([[s * 0.05, -0.06, 0.12], [s * 0.24, 0.12, 0.03], [s * 0.38, 0.32, -0.2]], 0.038, cyan)));
 
   // head
   const headPiv = new THREE.Group(); headPiv.position.y = 0.44; rig.add(headPiv);

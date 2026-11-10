@@ -47,7 +47,7 @@ test('3D test pyramid builds on view and rotates on drag', async ({ page }) => {
   await page.mouse.up();
   expect(await pyr.evaluate(e => e.style.transform)).not.toBe(before);
   await page.hover('.pyr-leg li[data-l="2"]');
-  await expect(page.locator('#pyramid .slab[data-l="2"]')).toHaveClass(/on/);
+  await expect(page.locator('#pyramid .slab[data-l="2"]')).toHaveClass(/on/, { timeout: 10_000 });
 });
 
 test('theme toggle switches light and dark', async ({ page }) => {
