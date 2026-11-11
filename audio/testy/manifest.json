@@ -56,7 +56,24 @@
     "ga": "ga.mp3",
     "ge": "ge.mp3",
     "gn": "gn.mp3",
-    "latest": "latest.mp3"
+    "latest": "latest.mp3",
+    "tickle": "tickle.mp3",
+    "grumpy": "grumpy.mp3",
+    "jd-ask": "jd-ask.mp3",
+    "jd-strong": "jd-strong.mp3",
+    "jd-good": "jd-good.mp3",
+    "jd-partial": "jd-partial.mp3",
+    "jd-none": "jd-none.mp3",
+    "tour-start": "tour-start.mp3",
+    "tour-about": "tour-about.mp3",
+    "tour-exp": "tour-exp.mp3",
+    "tour-projects": "tour-projects.mp3",
+    "tour-swarm": "tour-swarm.mp3",
+    "tour-code": "tour-code.mp3",
+    "tour-skills": "tour-skills.mp3",
+    "tour-writing": "tour-writing.mp3",
+    "tour-contact": "tour-contact.mp3",
+    "tour-end": "tour-end.mp3"
   },
   "voice": "kokoro:af_sky@1.3"
 }

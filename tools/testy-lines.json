@@ -55,5 +55,22 @@
   "ga": "[happy] Good afternoon! Ask me anything!",
   "ge": "[happy] Good evening! Ask me anything!",
   "gn": "[happy] Good night! Sweet dreams!",
-  "latest": "[excited] Sudipta is an S D E T at Gridcrest Technologies, formerly Iskraemeco India, since July twenty twenty three! Leading test automation, pipelines, and A I powered Q A!"
+  "latest": "[excited] Sudipta is an S D E T at Gridcrest Technologies, formerly Iskraemeco India, since July twenty twenty three! Leading test automation, pipelines, and A I powered Q A!",
+  "tickle": "[excited] Ah! That tickles!",
+  "grumpy": "[sad] Hmph! Okay, that's enough poking!",
+  "jd-ask": "[excited] Ooh! Paste the job description, and I'll test it against Sudipta's profile!",
+  "jd-strong": "[excited] Strong match! Sudipta passes almost every check!",
+  "jd-good": "[happy] Good match! Sudipta covers most of this role!",
+  "jd-partial": "[curious] Partial match. Sudipta covers some of it. Best to ask directly!",
+  "jd-none": "[curious] Hmm, I couldn't spot any skills in that. Can you paste the full job description?",
+  "tour-start": "[excited] Yay, a tour! Follow me!",
+  "tour-about": "[happy] This is Sudipta! An S D E T with over five years of experience, based in Kolkata.",
+  "tour-exp": "[excited] Now an S D E T at Gridcrest Technologies, and before that, Capgemini!",
+  "tour-projects": "[excited] The flagship project! An agentic Playwright framework!",
+  "tour-swarm": "[happy] Press deploy swarm, to watch the A I agents work!",
+  "tour-code": "[mischievously] Real code on GitHub. No N D A!",
+  "tour-skills": "[happy] Every skill, plus a three D test pyramid you can spin!",
+  "tour-writing": "[happy] A case study on how regression time was cut in half!",
+  "tour-contact": "[excited] And this is how you say hi to Sudipta!",
+  "tour-end": "[happy] That's the tour! Ask me anything!"
 }

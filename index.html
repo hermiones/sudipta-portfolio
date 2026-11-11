@@ -877,8 +877,30 @@ body.inspecting .insp-bar{display:flex}
 /* spawn: Testy drops in on first scroll */
 .buddy.unspawned{opacity:0;translate:0 -70px;pointer-events:none}
 .buddy{transition:translate .6s cubic-bezier(.3,1.5,.5,1),rotate .5s,opacity .3s}
+/* job-description match report */
+.tc-m.wide{max-width:96%}
+.jd-h{display:flex;justify-content:space-between;gap:8px;font-size:.72rem;color:var(--muted);margin-bottom:6px}
+.jd-h b{color:var(--pass)}
+.jd-bar{height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin-bottom:8px}
+.jd-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--pass),var(--red));transform-origin:0 50%;animation:jdBar .9s cubic-bezier(.2,.8,.2,1)}
+@keyframes jdBar{from{transform:scaleX(0)}}
+.jd ul{list-style:none;margin:0 0 8px!important;font-size:.74rem;display:grid;gap:3px}
+.jd li{display:flex;gap:7px;align-items:baseline;opacity:0;animation:jdIn .25s forwards;animation-delay:calc(var(--i) * 90ms)}
+.jd li i{font-style:normal;font-weight:700;width:12px;flex:none}
+.jd li.pass i{color:var(--pass)}.jd li.fail i{color:#f87171}.jd li.warn i{color:var(--warn)}
+@keyframes jdIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+/* guided tour controls */
+.tour-bar{position:fixed;right:140px;bottom:96px;z-index:202;display:flex;align-items:center;gap:8px;font-size:.75rem;color:var(--text);background:var(--card);border:1px solid var(--red);border-radius:99px;padding:6px 6px 6px 14px;box-shadow:0 12px 30px rgba(0,0,0,.4)}
+.tour-bar[hidden]{display:none}
+.tour-bar button{border:1px solid var(--line);background:transparent;color:var(--text);border-radius:99px;padding:4px 10px;cursor:pointer;font:inherit}
+.tour-bar button:hover{border-color:var(--red)}
+@media (max-width:900px){.tour-bar{right:12px;bottom:170px}}
+/* grumpy (CSS fallback) */
+.buddy[data-emo=grumpy] .b-eye{height:9px;top:10px}
+.buddy[data-emo=grumpy] .b-eye.l{rotate:16deg}.buddy[data-emo=grumpy] .b-eye.r{rotate:-16deg}
+.buddy[data-emo=grumpy] .m-smile{display:none}.buddy[data-emo=grumpy] .m-frown{display:block}
 /* hover bubble */
-.b-say{position:absolute;right:92px;top:2px;white-space:nowrap;font-size:.72rem;color:var(--text);background:var(--card);border:1px solid var(--red);border-radius:12px 12px 2px 12px;padding:6px 10px;box-shadow:0 8px 20px rgba(0,0,0,.3);opacity:0;transform:translateY(6px) scale(.9);transform-origin:100% 100%;transition:.25s;pointer-events:none}
+.b-say{position:absolute;right:92px;top:2px;white-space:normal;width:max-content;max-width:min(300px,calc(100vw - 130px));font-size:.72rem;color:var(--text);background:var(--card);border:1px solid var(--red);border-radius:12px 12px 2px 12px;padding:6px 10px;box-shadow:0 8px 20px rgba(0,0,0,.3);opacity:0;transform:translateY(6px) scale(.9);transform-origin:100% 100%;transition:.25s;pointer-events:none}
 .buddy.say .b-say{opacity:1;transform:none}
 .buddy.chat .b-say{opacity:0}
 /* Ask Testy chat panel */
@@ -908,9 +930,10 @@ body.inspecting .insp-bar{display:flex}
 .tc-q::-webkit-scrollbar{display:none}
 .tc-q button{flex:none;font:500 .72rem var(--mono);color:var(--text);background:transparent;border:1px solid var(--line);border-radius:99px;padding:6px 10px;cursor:pointer;white-space:nowrap;transition:.2s}
 .tc-q button:hover{border-color:var(--red);background:color-mix(in srgb,var(--red) 12%,transparent)}
-.tc-f{display:flex;gap:8px;padding:10px 12px 12px;border-top:1px solid var(--line)}
-.tc-f input{flex:1;min-width:0;font:inherit;font-size:.85rem;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px;outline:none}
-.tc-f input:focus{border-color:var(--red)}
+.tc-f{display:flex;align-items:flex-end;gap:8px;padding:10px 12px 12px;border-top:1px solid var(--line)}
+.tc-f textarea{flex:1;min-width:0;font:inherit;font-size:.85rem;line-height:1.4;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px;outline:none;resize:none;max-height:110px;overflow-y:auto}
+.tc-f button{height:38px}
+.tc-f textarea:focus{border-color:var(--red)}
 .tc-f button{flex:none;width:38px;border-radius:10px;border:0;background:var(--cta);color:var(--cta-ink);font-size:1rem;cursor:pointer}
 .tc-f .tc-mic{background:transparent;border:1px solid var(--line);font-size:.95rem}
 .tc-f .tc-mic:hover{border-color:var(--red)}
@@ -957,7 +980,7 @@ body.inspecting .insp-bar{display:flex}
     <button type="button" class="tc-b" id="tcX" aria-label="Close chat">✕</button></div>
   <div class="tc-log" id="tcLog" role="log" aria-live="polite"></div>
   <div class="tc-q" id="tcQ" aria-label="Suggested questions"></div>
-  <form class="tc-f" id="tcF" autocomplete="off"><input id="tcIn" maxlength="200" placeholder="Ask about Sudipta's work…" aria-label="Your question for Testy"><button type="button" class="tc-mic" id="tcMic" aria-label="Ask by voice" title="Ask by voice">🎤</button><button type="submit" aria-label="Send question">➤</button></form>
+  <form class="tc-f" id="tcF" autocomplete="off"><textarea id="tcIn" rows="1" maxlength="8000" placeholder="Ask, or paste a job description" aria-label="Your question for Testy, or a job description to match"></textarea><button type="button" class="tc-mic" id="tcMic" aria-label="Ask by voice" title="Ask by voice">🎤</button><button type="submit" aria-label="Send question">➤</button></form>
 </div>
 <div class="cur-glow"></div><div class="cur-ring"></div><div class="cur-dot"></div>
 
@@ -1015,7 +1038,7 @@ body.inspecting .insp-bar{display:flex}
     </div>
     <a class="ci" href="https://github.com/hermiones/sudipta-portfolio/actions/workflows/tests.yml" target="_blank" rel="noopener">
       <img src="https://github.com/hermiones/sudipta-portfolio/actions/workflows/tests.yml/badge.svg" alt="Portfolio tests: live CI status" height="20" loading="lazy">
-      <span>This site is tested: <b>36 Playwright checks</b> on Chrome, Firefox &amp; Safari, run on every deploy</span>
+      <span>This site is tested: <b>39 Playwright checks</b> on Chrome, Firefox &amp; Safari, run on every deploy</span>
     </a>
   </div>
   <figure class="portrait">
@@ -2179,6 +2202,10 @@ window.celebrate=()=>{let done;try{done=sessionStorage.getItem('cheered')}catch(
 // ---- what Testy knows: only facts that are on this site ----
  const A=(t,id)=>`<button type="button" class="lk" data-act="${id}">${t}</button>`;
  const KB=[
+  {q:'Match a job description 📄',id:'jd-ask',e:'excited',re:/\bjob description\b|\bjd\b|\bmatch (a|my|this|our) (job|role|opening)\b|\b(check|test) (a|this|my|our) (job|role|jd)\b/,k:['jd'],
+   s:"Paste the job description, and I'll test it against Sudipta's profile!",a:`Ooh, paste the job description below and I'll run it as a <b>test suite</b> against Sudipta's profile! 🧪`},
+  {q:'Show me around 🗺️',id:'tour-start',e:'excited',re:/\b(tour|show me around|walk me through|guide me|give me a tour|show me the site)\b/,k:['tour','walkthrough'],
+   s:"Yay, a tour! Follow me!",a:`Yay, a tour! Follow me 🗺️`},
   {q:'Who is Sudipta?',k:['who','about','sudipta','introduce','summary','tell','herself','himself','themselves','profile','overview','background'],
    s:"Sudipta Mohanty is an SDET with over five years in test automation, CI CD pipelines and AI-assisted QA.",
    a:`<b>Sudipta Mohanty</b> is an SDET with <b>5+ years</b> (5 years 2 months) in test automation, CI/CD and AI-assisted QA. Sudipta builds Playwright, Selenium and Pytest frameworks, designs Azure DevOps and AWS pipelines, and owns the quality gate for an external automation team. ${A('Profile at a glance →','hire')}`},
@@ -2192,7 +2219,7 @@ window.celebrate=()=>{let done;try{done=sessionStorage.getItem('cheered')}catch(
   {q:'Biggest wins?',k:['achievement','achievements','wins','impact','results','proud','best','highlights','metrics','numbers','accomplish','success'],
    s:"Cutting regression time in half, forty percent fewer escaped defects, sixty to eighty percent faster deploys, and leading a team of four.",
    a:`Some highlights:<ul><li><b>−50% regression time</b> across 500+ automated cases</li><li><b>−40% escaped defects</b> with Claude multi-agent QA</li><li><b>60–80% faster deploys</b> across 10+ microservices</li><li>Led a team of 4 · 8 releases in a row with no UAT bug leakage</li><li>🏆 Top Performer, Sogeti Q1 Rockstar (Capgemini, 2022)</li></ul>${A('Read the case study →','/case-study.html')}`},
-  {q:'Tech stack?',k:['stack','tech','tools','skills','skill','technologies','playwright','selenium','pytest','python','language','framework','frameworks','know','appium','postman','aws','azure','docker','kafka','sql','ci','cd','cicd','devops','pipeline','pipelines'],
+  {q:'Tech stack?',k:['stack','tech','tools','skills','skill','technologies','playwright','selenium','pytest','python','language','framework','frameworks','appium','postman','aws','azure','docker','kafka','sql','ci','cd','cicd','devops','pipeline','pipelines'],
    s:"Playwright, Selenium and Pytest for automation, Azure DevOps, GitHub Actions and AWS for CI CD, plus Claude multi-agent workflows for AI-assisted QA.",
    a:`<ul><li><b>Automation:</b> Playwright, Selenium, Pytest, xdist, Grid, POM, Appium, Postman, Requests, Allure</li><li><b>CI/CD &amp; cloud:</b> Azure DevOps YAML, GitHub Actions, AWS CodePipeline, Docker, EC2, S3, CloudFront</li><li><b>Data:</b> SQL Server, Kafka (KRaft), RabbitMQ, Grafana</li><li><b>AI:</b> Claude, Cursor, multi-agent fan-out/fan-in, RAG with FAISS</li></ul>${A('See the skills matrix →','#matrix')}`},
   {q:'How is AI used in QA?',k:['ai','claude','agent','agents','agentic','llm','genai','rag','faiss','multi','swarm','gpt','cursor','automation'],
@@ -2225,7 +2252,7 @@ window.celebrate=()=>{let done;try{done=sessionStorage.getItem('cheered')}catch(
   {q:'Why hire Sudipta?',k:['why','strength','strengths','strong','fit','choose','unique','special','qualities','stand','hire'],
    s:"End to end ownership, real measurable results, and practical A I powered QA!",
    a:`Three reasons:<ul><li><b>End-to-end ownership:</b> frameworks, CI/CD pipelines and the quality gate, built from scratch across 3 product lines</li><li><b>Measurable results:</b> −50% regression time, −40% escaped defects, 60–80% faster deploys</li><li><b>Practical AI-assisted QA:</b> Claude multi-agent workflows already in production use</li></ul>${A('Profile at a glance →','hire')}`},
-  {q:'Team leadership?',k:['leader','leadership','manage','managed','management','mentor','mentoring','team','teams','led','people'],
+  {q:'Team leadership?',k:['lead','leader','leadership','manage','managed','management','mentor','mentoring','team','teams','led','people'],
    s:"Yes! Sudipta led a team of four, and owns the quality gate for an external automation team!",
    a:`<b>Yes.</b> Sudipta led a team of 4: planned sprints, reviewed test code and PRs, and owned delivery and release quality end to end. Sudipta also owns the automation quality gate (coding standards, PR conventions, test strategy, review checklist) for an external team, and is a Certified ScrumMaster®.`},
   {id:'salary',e:'happy',k:['salary','ctc','compensation','pay','package','expected','expectation','expectations','lpa','money'],s:"Ooh, that's a grown up question! Best to ask Sudipta directly!",a:`That's best discussed with Sudipta directly. ${A('Send a message →','#contact')}`},
@@ -2277,10 +2304,18 @@ window.celebrate=()=>{let done;try{done=sessionStorage.getItem('cheered')}catch(
   kubernetes:['Kubernetes','Docker and AWS'],k8s:['Kubernetes','Docker and AWS'],terraform:['Terraform','AWS CI/CD'],gcp:['GCP','AWS'],gitlab:['GitLab CI','Azure DevOps and GitHub Actions'],
   browserstack:['BrowserStack','LambdaTest'],webdriverio:['WebdriverIO','Playwright and Selenium'],puppeteer:['Puppeteer','Playwright'],katalon:['Katalon','Playwright and Selenium'],
   tosca:['Tosca','Playwright and Selenium'],uft:['UFT','Playwright and Selenium'],ios:['iOS','Appium and Android'],xcuitest:['XCUITest','Appium'],espresso:['Espresso','Appium'],
-  'c#':['C#','Python'],csharp:['C#','Python'],golang:['Go','Python'],ruby:['Ruby','Python'],php:['PHP','Python'],react:['React development','pipelines for React apps']};
- function skillAnswer(q){const ws=words(q),known=SK.filter(s=>hits(ws,s.al));
-  const unknown=[...new Set(ws.filter(w=>NOT[w]))];
-  if(!known.length&&!unknown.length)return null;
+  selenide:['Selenide','Selenium + Pytest'],'c#':['C#','Python'],csharp:['C#','Python'],golang:['Go','Python'],ruby:['Ruby','Python'],php:['PHP','Python'],react:['React development','pipelines for React apps']};
+ const esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const COMMON=new Set(['testing','tests','tested','tester','testers','express','expressed','how','what','about','anything','something','everything','it','this','that','them','me','her','him','to','much','more','well','good','well']);
+ const ASKS=/\b(?:know|knows|knowing|use|uses|used|using|experience (?:with|in|on)|worked (?:with|on)|work with|familiar with|skilled in|good at|expert in|tried)\s+(?:any |about |in |with )?([a-z0-9#+.\-]+(?:\s[a-z0-9#+.\-]+)?)/i;
+ function skillAnswer(q){const ws=words(q),known=SK.filter(s=>hits(ws.filter(w=>!NOT[w]),s.al));   // an exact 'not on site' tool never fuzzy-matches a real one
+  const unknown=[...new Set(ws.filter(w=>!COMMON.has(w)).map(w=>NOT[w]?w:Object.keys(NOT).find(k=>k.length>=6&&fuzzy(w,k))).filter(Boolean))];
+  if(!known.length&&!unknown.length){   // "does she know X?" for a tool that isn't on the site: say so honestly
+   const m=q.match(ASKS);if(!m)return null;
+   const term=m[1].toLowerCase().replace(/\b(as|well|too|also|or|and|tools?|frameworks?|testing|tests?|please)\b.*$/,'').trim(),t0=term.split(' ')[0];
+   if(!term||STOP.has(t0)||COMMON.has(t0)||KB.some(e=>e.k.some(k=>k===t0||fuzzy(t0,k)))||SK.some(x=>hits([t0],x.al)))return null;
+   return{id:'nolist',e:'think',s:"Hmm, I don't see that on Sudipta's site. Best to ask Sudipta directly!",
+    a:`I don't see <b>${esc(term.replace(/\b\w/g,c=>c.toUpperCase()))}</b> on Sudipta's site. For anything not listed, ${A('ask Sudipta directly →','#contact')}`}}
   const notes=unknown.map(k=>`I don't see <b>${NOT[k][0]}</b> on Sudipta's site. The closest experience is ${NOT[k][1]}.`);
   if(known.length===1&&!unknown.length)return{id:known[0].id,e:'excited',s:known[0].s,a:known[0].a};
   if(!known.length)return{id:'nolist',e:'think',s:"Hmm, I don't see that on Sudipta's site. Best to ask Sudipta directly!",
@@ -2302,11 +2337,16 @@ window.celebrate=()=>{let done;try{done=sessionStorage.getItem('cheered')}catch(
  // ---- chat UI ----
  function add(html,who){const m=document.createElement('div');m.className='tc-m '+who;if(who==='tme')m.textContent=html;else m.innerHTML=html;log.appendChild(m);log.scrollTop=log.scrollHeight;return m}
  let busy=false;
- function ask(q){if(busy||!q.trim())return;busy=true;add(q.trim(),'tme');const e=answer(q.trim());const d=add('<i></i><i></i><i></i>','tbot tdots');setEmo('think');hum();
+ let jdMode=false;
+ function ask(q){if(busy||!q.trim())return;const tq=q.trim();if(looksLikeJD(tq)||(jdMode&&tq.length>=80))return runJD(tq);jdMode=false;busy=true;add(q.trim(),'tme');const e=answer(q.trim());
+  if(e.id==='jd-ask'){jdMode=true;inp.placeholder='Paste the job description here…'}
+  if(e.id==='tour-start')setTimeout(startTour,1600);const d=add('<i></i><i></i><i></i>','tbot tdots');setEmo('think');hum();
   clipBuf(e.id);   // start loading the voice clip while Testy "thinks"
   setTimeout(()=>{d.remove();add(e.a,'tbot');feel(e.e,e.s,e.id,1500);busy=false},750+Math.random()*350)}
  KB.filter(e=>e.q).forEach(e=>{const b=document.createElement('button');b.type='button';b.textContent=e.q;b.addEventListener('click',()=>ask(e.q));chips.appendChild(b)});
- form.addEventListener('submit',e=>{e.preventDefault();const v=inp.value;inp.value='';ask(v)});
+ form.addEventListener('submit',e=>{e.preventDefault();const v=inp.value;inp.value='';inp.style.height='';ask(v)});
+ inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();form.requestSubmit()}});   // Enter sends, Shift+Enter = new line
+ inp.addEventListener('input',()=>{inp.style.height='auto';inp.style.height=Math.min(110,inp.scrollHeight)+'px'});
  log.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
   if(a==='cv')document.querySelector('a[download][href$=".pdf"]').click();else if(a==='hire'){close();openHire()}
   else if(a==='li')window.open('https://www.linkedin.com/in/sudiptamohanty','_blank','noopener');else if(a==='gh')window.open('https://github.com/hermiones','_blank','noopener');
@@ -2324,7 +2364,15 @@ window.celebrate=()=>{let done;try{done=sessionStorage.getItem('cheered')}catch(
  if(tucked)tuck(true);
  document.getElementById('tcHide').addEventListener('click',()=>{close();tuck(true);toast('🙈 Testy is hiding at the edge. Click to bring Testy back.')});
  const toggle=()=>{if(tucked){tuck(false);setEmo('love',1600);hop();return}panel.classList.contains('open')?close():open()};
- bd.addEventListener('click',toggle);
+ // clicks: open the chat, then each click is a poke (✕ / Esc close it). Quick pokes tickle; too many make Testy grumpy.
+ let pokes=[],grumpyUntil=0;
+ function pokeTesty(){const now=performance.now(),c=actx();if(now<grumpyUntil){bubble('hmph 😤',1200);return}
+  pokes=pokes.filter(t=>now-t<1600);pokes.push(now);const n=pokes.length;if(c)chime(c.currentTime+.01,[880+n*110]);
+  if(n>=7){pokes=[];grumpyUntil=now+3200;fx('💢',2,'#f87171');bubble("hmph! that's enough poking 😤",2600);feel('grumpy',"Hmph! Okay, that's enough poking!",'grumpy',1400);
+   setTimeout(()=>{bubble('…okay, I forgive you 🥺',2200);setEmo('love',1800)},3300)}
+  else if(n>=3){if(n===3)feel('laugh','Ah! That tickles!','tickle',700);else setEmo('laugh',1400);bubble(n>=5?'stop it, hahaha 😆':'that tickles! 😆',1500)}
+  else{setEmo('happy',900);hop();bubble(n===1?'boop! 😊':'hehe 😊',1100)}}
+ bd.addEventListener('click',()=>{if(!tucked&&panel.classList.contains('open'))pokeTesty();else toggle()});
  bd.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}});
  document.getElementById('tcX').addEventListener('click',()=>{close();bd.focus()});
  addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('open'))close()});
@@ -2358,6 +2406,52 @@ window.celebrate=()=>{let done;try{done=sessionStorage.getItem('cheered')}catch(
  const sio2=new IntersectionObserver(es=>es.forEach(e=>{const id=e.target.id;if(!e.isIntersecting||seen[id]||!spawned||tucked||panel.classList.contains('open')||bd.dataset.emo)return;
   seen[id]=1;try{sessionStorage.setItem('testySeen',JSON.stringify(seen))}catch(x){}const[m,msg]=SECT[id];setEmo(m,2000);bubble(msg,2600)}),{threshold:.35});
  Object.keys(SECT).forEach(id=>{const el=document.getElementById(id);if(el)sio2.observe(el)});
+  // ---- job-description match: run the JD as a "test suite" against Sudipta's profile ----
+ const CITIES={bengaluru:'Bengaluru',bangalore:'Bengaluru',hyderabad:'Hyderabad',delhi:'Delhi NCR',ncr:'Delhi NCR',gurgaon:'Delhi NCR',gurugram:'Delhi NCR',noida:'Delhi NCR',mumbai:'Mumbai',pune:'Pune',kolkata:'Kolkata',chennai:'Chennai',remote:'Remote'};
+ function looksLikeJD(t){return t.length>260||(t.length>120&&(t.split(/\n/).filter(l=>l.trim()).length>=4||/\b(responsibilit\w*|requirements?|qualifications?|we are looking|job description|must have|nice to have|years of experience|what you.ll do)\b/i.test(t)))}
+ function jdRows(t){const ws=words(t),low=t.toLowerCase(),rows=[];
+  if(/\b(sdet|qa|quality (assurance|engineer)|test(ing)? automation|automation (engineer|tester)|test engineer|tester|quality engineering)\b/i.test(t))rows.push(['pass','Role fit: SDET / QA automation']);
+  const ym=low.match(/(\d{1,2})\s*(?:\+|plus)?\s*(?:-|–|to)?\s*(\d{1,2})?\s*\+?\s*(?:years|yrs)/);
+  if(ym){const lo=+ym[1],hi=ym[2]?+ym[2]:0;rows.push(lo<=5?['pass',`Experience: asks ${lo}${hi?'–'+hi:'+'} yrs · has 5+ (5y 2m)`]:['warn',`Experience: asks ${lo}+ yrs · has 5+ (5y 2m)`])}
+  if(/\b(ai|llm|genai|gen ai|machine learning|agentic|copilot|claude|chatgpt|prompt)\b/i.test(t))rows.push(['pass','AI-assisted QA (Claude multi-agent, RAG)']);
+  SK.forEach(x=>{if(hits(ws.filter(w=>!NOT[w]),x.al))rows.push(['pass',x.n])});
+  [...new Set(ws.filter(w=>NOT[w]))].forEach(k=>rows.push(['fail',`${NOT[k][0]} · closest: ${NOT[k][1]}`]));
+  const city=Object.keys(CITIES).find(c=>ws.includes(c));
+  if(city)rows.push(city==='remote'?['warn','Remote: open to relocate pan-India, ask about remote']:['pass',`Location: ${CITIES[city]} · ${city==='kolkata'?'based here':'open to relocate pan-India'}`]);
+  return rows}
+ function runJD(text){busy=true;jdMode=false;inp.placeholder="Ask, or paste a job description";
+  add(text.length>160?`📄 Job description · ${text.length.toLocaleString()} characters`:text,'tme');
+  const d=add('<i></i><i></i><i></i>','tbot tdots');setEmo('think');hum();
+  setTimeout(()=>{d.remove();const rows=jdRows(text),P=rows.filter(r=>r[0]==='pass').length,F=rows.filter(r=>r[0]==='fail').length,W=rows.filter(r=>r[0]==='warn').length;
+   if(P+F<2){add("Hmm, I couldn't spot any skills in that 🤔 Can you paste the full job description?",'tbot');feel('think',"Hmm, I couldn't spot any skills in that.",'jd-none');busy=false;return}
+   const pct=Math.round(P/Math.max(1,P+F+W*.5)*100),v=pct>=80?['jd-strong','excited','Strong match! 🎉']:pct>=60?['jd-good','happy','Good match 👍']:['jd-partial','think','Partial match'];
+   const ic={pass:'✓',fail:'✗',warn:'!'};
+   const m=add(`<div class="jd"><div class="jd-h mono"><span>▤ JD test run</span><b>${P} passed${F?` · ${F} failed`:''}${W?` · ${W} warning`:''}</b></div><div class="jd-bar"><i style="width:${pct}%"></i></div>`+
+    `<ul class="mono">${rows.map((r,i)=>`<li class="${r[0]}" style="--i:${i}"><i>${ic[r[0]]}</i><span>${esc(r[1])}</span></li>`).join('')}</ul>`+
+    `<p><b>${v[2]}</b> · ${pct}% of checks pass. ${A('Send this role to Sudipta →','#contact')} · ${A('⤓ CV','cv')}</p></div>`,'tbot wide');
+   feel(v[1],v[2],v[0],1800);busy=false},1300)}
+
+ // ---- guided tour: Testy walks the visitor through the page ----
+ const TOUR=[['about','tour-about','love','This is Sudipta: SDET, 5+ years, based in Kolkata 👋'],
+  ['experience','tour-exp','excited','Now SDET at Gridcrest Technologies, before that Capgemini 💼'],
+  ['flagships','tour-projects','excited','The flagship: an agentic Playwright framework 🚀'],
+  ['swarm','tour-swarm','happy','Press “Deploy swarm” to watch the AI agents work 🤖'],
+  ['code','tour-code','wink','Real code on GitHub, no NDA 😉'],
+  ['matrix','tour-skills','happy','Every skill, plus a 3D test pyramid you can spin 🧪'],
+  ['writing','tour-writing','happy','A case study on cutting regression time in half ✍️'],
+  ['contact','tour-contact','love','And this is how you say hi to Sudipta 💌']];
+ let tourI=-1,tourT=0;
+ const tbar=document.createElement('div');tbar.className='tour-bar mono';tbar.hidden=true;tbar.setAttribute('role','status');
+ tbar.innerHTML='<span class="tn"></span><button type="button" data-t="next">Next ▸</button><button type="button" data-t="stop" aria-label="Stop the tour">✕</button>';document.body.appendChild(tbar);
+ function tourStep(i){clearTimeout(tourT);if(i>=TOUR.length)return endTour(true);tourI=i;const[id,clip,mood,line]=TOUR[i];
+  tbar.querySelector('.tn').textContent=`Tour ${i+1}/${TOUR.length}`;seen[id]=1;
+  document.getElementById(id)?.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});
+  setTimeout(()=>{if(tourI!==i)return;bubble(line,6000);feel(mood,line,clip,500).then(()=>{if(tourI===i)tourT=setTimeout(()=>tourStep(i+1),1300)})},800)}
+ function startTour(){close();tbar.hidden=false;spawn();tourStep(0)}
+ function endTour(done){clearTimeout(tourT);if(tourI<0)return;tourI=-1;tbar.hidden=true;if(done){setEmo('excited',1800);bubble("that's the tour! ask me anything 💬",3200);feel('excited',"That's the tour! Ask me anything!",'tour-end',900)}}
+ tbar.addEventListener('click',e=>{const b=e.target.closest('button');if(b)b.dataset.t==='next'?tourStep(tourI+1):endTour(false)});
+ ['wheel','touchmove'].forEach(ev=>addEventListener(ev,()=>{if(tourI>=0)endTour(false)},{passive:true}));   // the visitor took over scrolling
+ addEventListener('keydown',e=>{if(e.key==='Escape'&&tourI>=0)endTour(false)});
  (function load3d(){let ok=false;const force=/[?&]testy3d=1/.test(location.search);
   // only with a real GPU: software-rendered WebGL (no GPU, VMs, very old machines) would make the page sluggish, so those visitors get the light CSS Testy
   try{const c=document.createElement('canvas'),o={failIfMajorPerformanceCaveat:!force};ok=!!(c.getContext('webgl2',o)||c.getContext('webgl',o))}catch(e){}
@@ -2367,7 +2461,7 @@ window.celebrate=()=>{let done;try{done=sessionStorage.getItem('cheered')}catch(
   // wait for the page load AND the build intro to finish, so the 3D never competes with the first impression
   const root=document.documentElement,ready=()=>document.readyState==='complete'&&!root.classList.contains('prebuild')&&!root.classList.contains('building');
   (function wait(){ready()?idle(go,{timeout:3000}):setTimeout(wait,500)})()})();
- window.testy={open,close,ask,emo:setEmo,answer,state:()=>({sleep:bd.classList.contains('sleep'),twirls,running:performance.now()<runUntil,yaw,pitch,gx:lgx,gy:lgy,emo:bd.dataset.emo||'',mouth:mouthOpen,hops,blink:bd.classList.contains('blink'),happy:bd.classList.contains('happy'),near,talking:bd.classList.contains('talking'),reduce})};})();
+ window.testy={open,close,ask,emo:setEmo,answer,tour:startTour,state:()=>({sleep:bd.classList.contains('sleep'),twirls,running:performance.now()<runUntil,yaw,pitch,gx:lgx,gy:lgy,emo:bd.dataset.emo||'',mouth:mouthOpen,hops,blink:bd.classList.contains('blink'),happy:bd.classList.contains('happy'),near,talking:bd.classList.contains('talking'),reduce})};})();
 </script>
 </body>
 </html>

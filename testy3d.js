@@ -204,17 +204,17 @@ export function mount(bd, api) {
       E.arc.rotation.z = e === 'sleep' ? Math.PI : 0; E.arc.position.y = e === 'sleep' ? 0.06 : -0.04;
       E.arc.visible = arc; E.st.visible = e === 'excited'; E.ht.visible = e === 'love'; E.chev.visible = e === 'laugh';
       E.normal.visible = !arc && !E.st.visible && !E.ht.visible && !E.chev.visible;
-      E.slot.rotation.z = e === 'sad' ? -E.s * 0.28 : 0;
+      E.slot.rotation.z = e === 'sad' ? -E.s * 0.28 : e === 'grumpy' ? E.s * 0.32 : 0;
     });
     tear.visible = e === 'sad';
     const open = e === 'excited' || e === 'love' || e === 'laugh' || talkingOpen;
-    mOpen.visible = open; mO.visible = !open && (e === 'listen' || e === 'sleep'); mFrown.visible = !open && e === 'sad'; mHmm.visible = !open && e === 'think';
+    mOpen.visible = open; mO.visible = !open && (e === 'listen' || e === 'sleep'); mFrown.visible = !open && (e === 'sad' || e === 'grumpy'); mHmm.visible = !open && e === 'think';
     mSmile.visible = !open && !mO.visible && !mFrown.visible && !mHmm.visible;
   }
 
   // ---------- animation ----------
   let lastDraw = 0, raf = 0, t0 = performance.now(), lastHops = api.state().hops, hopT = -9, waveUntil = 0, lastEmo = '', lastHappy = false;
-  let lastTw = api.state().twirls, twT = -9, doze = 0, yawV = 0, pitchV = 0;
+  let lastTw = api.state().twirls, twT = -9, doze = 0, yawV = 0, pitchV = 0, puff = 0;
   let antA = 0, antV = 0, antB = 0, antW = 0, cardA = 0, cardV = 0, pYaw = 0, pPitch = 0, blink = 1, yawS = 0, pitchS = 0, mouthS = 0, jog = 0;
   function frame(now) {
     raf = requestAnimationFrame(frame);
@@ -267,7 +267,11 @@ export function mount(bd, api) {
 
     // blink
     blink += ((S.blink ? 0.08 : 1) - blink) * 0.5;
-    eyes.forEach(E => { E.normal.scale.y = (S.emo === 'think' && E.s > 0 ? 0.45 : S.emo === 'listen' ? 1.12 : 1) * blink; E.normal.scale.x = S.emo === 'listen' ? 1.08 : 1; });
+    puff += ((S.emo === 'grumpy' ? 1 : 0) - puff) * 0.15;
+    head.scale.set(HA * (1 + puff * 0.06), HB * (1 - puff * 0.02), HC * (1 + puff * 0.04));
+    cheeks.forEach(c => c.scale.set(1.4 * (1 + puff * 0.35), 0.85 * (1 + puff * 0.35), 1));
+    if (puff > 0.05 && !calm) rig.rotation.z += Math.sin(t * 55) * 0.012 * puff;   // tiny angry tremble
+    eyes.forEach(E => { E.normal.scale.y = (S.emo === 'think' && E.s > 0 ? 0.45 : S.emo === 'listen' ? 1.12 : S.emo === 'grumpy' ? 0.62 : 1) * blink; E.normal.scale.x = S.emo === 'listen' ? 1.08 : 1; });
     eyes.forEach(E => { const pulse = 1 + Math.sin(t * 9) * 0.08; E.st.scale.setScalar(pulse); E.ht.scale.setScalar(1 + Math.max(0, Math.sin(t * 11)) * 0.15); E.st.rotation.z = Math.sin(t * 4) * 0.25; });
     // tear falls and fades in a loop
     const tp = (t % 1.4) / 1.4; tear.position.set(0.03, -0.16 - tp * 0.32, 0.06); tearMat.opacity = tp < 0.2 ? tp * 4.5 : 0.9 * (1 - (tp - 0.2) / 0.8);

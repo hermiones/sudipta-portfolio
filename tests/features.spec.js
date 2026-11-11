@@ -1,5 +1,5 @@
 // Interactive features: locator inspector, coverage gutter, 3D test pyramid, theme reveal, mascot chat
-// 5 tests x 3 engines (Chromium, Firefox, WebKit) = 15 tests
+// 6 tests x 3 engines (Chromium, Firefox, WebKit) = 18 tests
 import { test, expect } from '@playwright/test';
 
 test.use({ viewport: { width: 1366, height: 820 } });
@@ -79,6 +79,39 @@ test('Testy follows the cursor and answers questions about Sudipta', async ({ pa
   await page.fill('#tcIn', 'where is she based');
   await page.press('#tcIn', 'Enter');
   await expect(chat.locator('.tc-m.tbot').last()).toContainText('Kolkata');
+  await page.fill('#tcIn', 'does she knows Cyprus');            // misspelled tool that isn't on the site: honest answer, not 'off-topic'
+  await page.press('#tcIn', 'Enter');
+  await expect(chat.locator('.tc-m.tbot').last()).toContainText("I don't see Cypress");
   await page.keyboard.press('Escape');
   await expect(chat).toBeHidden();
+});
+
+test('Testy matches a job description, gets tickled and gives a guided tour', async ({ page }) => {
+  await page.mouse.wheel(0, 400);
+  await page.waitForTimeout(900);
+  const buddy = page.getByRole('button', { name: /Ask Testy/ });
+  await buddy.click();
+  const chat = page.getByRole('dialog', { name: /Ask Testy/ });
+  await expect(chat).toBeVisible();
+
+  // a pasted job description is "run" as a test suite against the profile
+  await page.fill('#tcIn', 'We are looking for an SDET with 4+ years of experience.\nMust have: Playwright, Python, REST API testing, Azure DevOps CI/CD.\nNice to have: Java, Kafka.\nLocation: Bengaluru');
+  await page.press('#tcIn', 'Enter');
+  const report = chat.locator('.jd');
+  await expect(report).toContainText('passed');
+  await expect(report).toContainText('Playwright');
+  await expect(report).toContainText('Java');            // honest: Java is not on the profile
+
+  // quick pokes while the chat is open tickle Testy
+  for (let i = 0; i < 3; i++) await buddy.click({ delay: 20 });
+  await expect(page.locator('#buddy')).toHaveAttribute('data-emo', 'laugh');
+
+  // guided tour
+  await chat.getByRole('button', { name: /Show me around/ }).click();
+  const bar = page.locator('.tour-bar');
+  await expect(bar).toContainText('Tour 1/8', { timeout: 6000 });
+  await bar.getByRole('button', { name: /Next/ }).click();
+  await expect(bar).toContainText('Tour 2/8');
+  await page.keyboard.press('Escape');
+  await expect(bar).toBeHidden();
 });

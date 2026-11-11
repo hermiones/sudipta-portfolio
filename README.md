@@ -9,7 +9,7 @@ Live at **https://sudipta.site**.
 
 An SDET's portfolio should be tested too. [`tests/`](tests/) holds a Playwright suite that checks the live site on
 **Chromium (Chrome/Edge), Firefox and WebKit (Safari)** at 7 screen sizes, from iPhone SE to a 1920px desktop, plus interaction tests for the locator inspector, coverage gutter,
-3D test pyramid, theme toggle and mascot. That's 36 checks in total:
+3D test pyramid, theme toggle and the Testy mascot (chat, job-description match, tour). That's 39 checks in total:
 
 - no JavaScript errors
 - no horizontal scroll or content overflowing the screen
